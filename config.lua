@@ -6,11 +6,11 @@ local gfilesystem = require("gears.filesystem")
 local config = {}
 
 config.features = {
-    screenshot_tools = false,
+    screenshot_tools = true,
     magnifier_tools = false,
     torrent_widget = false,
     weather_widget = false,
-    redshift_widget = false,
+    redshift_widget = true,
     wallpaper_menu = false,
 }
 
@@ -20,7 +20,7 @@ config.places.config = os.getenv("XDG_CONFIG_HOME") or (config.places.home .. "/
 config.places.awesome = string.match(gfilesystem.get_configuration_dir(), "^(/?.-)/*$")
 config.places.theme = config.places.awesome .. "/theme"
 config.places.screenshots = config.places.home .. "/inbox/screenshots"
-config.places.wallpapers = config.places.home .. "/media/look/wallpapers"
+config.places.wallpapers = config.places.home .. "/Pictures/Wallpapers"
 
 config.wm = {
     name = "awesome",
@@ -30,17 +30,17 @@ local terminal = "alacritty"
 local terminal_execute = terminal .. " -e "
 
 config.apps = {
-    shell = "bash",
+    shell = "fish",
     terminal = terminal,
-    editor = terminal_execute .. "micro",
-    browser = "librewolf",
+    editor = terminal_execute .. "code",
+    browser = "brave-browser",
     private_browser = "librewolf --private-window",
-    file_manager = terminal_execute .. "lf",
-    calculator = "speedcrunch",
+    file_manager = "dolphin",
+    calculator = "kcalc",
     mixer = terminal_execute .. "pulsemixer",
-    bluetooth_control = terminal_execute .. "bluetoothctl",
+    bluetooth_control = terminal_execute .. "blueman-manager",
     music_player = "spotify",
-    video_player = "freetube",
+    video_player = "vlc",
 }
 
 config.power = {
@@ -54,7 +54,7 @@ config.power = {
 
 config.actions = {
     qr_code_clipboard = "qrclip",
-    show_launcher = "rofi -show",
+    show_launcher = "applauncher.sh",
     show_emoji_picker = config.places.config .. "/rofi/emoji-run.sh",
 }
 

@@ -123,25 +123,27 @@ ruled.client.connect_signal("request::rules", function()
         },
     }
     ruled.client.append_rule {
-        id = "size_hints",
+        -- id = "size_hints",
         rule_any = {
             class = {
-                "XTerm",
+                "rviz",
             },
         },
         properties = {
-            size_hints_honor = false,
+            tag = "3",
         },
     }
     ----------------------------------------------------------------------------------------------------
     ruled.client.append_rule {
         rule = {
-            class = "SpeedCrunch",
+            class = "gazebo",
         },
         properties = {
-            floating = true,
-            ontop = true,
+            floating = false,
+            ontop = false,
             titlebars_enabled = true,
+            tag = "3",
+            maximized = false,
         },
     }
     ----------------------------------------------------------------------------------------------------

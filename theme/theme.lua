@@ -22,7 +22,7 @@ local theme = {}
 
 ----------------------------------------------------------------------------------------------------
 
-theme.gap = dpi(6)
+theme.gap = dpi(3)
 
 ----------------------------------------------------------------------------------------------------
 
@@ -66,11 +66,11 @@ end
 
 -- Tomorrow Night (https://github.com/chriskempson/tomorrow-theme)
 theme.palette = setmetatable({
-    black          = "#1d1f21",
+    black          = "#0d1017",
     white          = "#c5c8c6",
     red            = "#cc6666",
     orange         = "#de935f",
-    yellow         = "#f0c674",
+    yellow         = "#32b8e6",
     green          = "#7cb36b", -- original: #b5bd68
     cyan           = "#78bab9", -- original: #8abeb7
     blue           = "#81a2be",
@@ -81,7 +81,7 @@ theme.palette = setmetatable({
     white_bright   = "#eaeaea",
     red_bright     = "#d54e53",
     orange_bright  = "#e78c45",
-    yellow_bright  = "#e7c547",
+    yellow_bright  = "#32b8e6",
     green_bright   = "#71c464", -- original: #b9ca4a
     cyan_bright    = "#6acdcc", -- original: #70c0b1
     blue_bright    = "#7aa6da",
@@ -133,11 +133,11 @@ theme.screen_selection_color = hcolor.change(theme.common.primary, { alpha = 0.2
 
 theme.wibar = {
     bg = theme.common.bg,
-    spacing = dpi(12),
-    paddings = hui.thickness { dpi(8), dpi(16) },
+    spacing = dpi(6),
+    paddings = hui.thickness { dpi(4), dpi(8) },
 }
 
-theme.wibar.item_height = dpi(30)
+theme.wibar.item_height = dpi(27)
 theme.wibar.height = theme.wibar.item_height + theme.wibar.paddings.top + theme.wibar.paddings.bottom
 
 -- TODO: Rename `theme.wibar.build_placement`
@@ -250,7 +250,7 @@ theme.popup.default_style = {
     bg = theme.common.bg,
     fg = theme.common.fg,
     border_color = theme.common.bg_bright,
-    border_width = dpi(3),
+    border_width = dpi(1),
     shape = function(cr, width, height)
         gshape.rounded_rect(cr, width, height, dpi(12))
     end,
@@ -683,7 +683,7 @@ do
 
     theme.titlebar.default = {
         height = dpi(32),
-        border_width = dpi(3),
+        border_width = dpi(1),
         paddings = hui.thickness { dpi(6), dpi(8) },
         spacing = dpi(4),
         icons = {
@@ -934,7 +934,7 @@ theme.snap = {
         distance = dpi(8),
         bg = theme.common.fg .. "33",
         border_color = theme.palette.red_bright,
-        border_width = dpi(2),
+        border_width = dpi(1),
         shape = function(cr, width, height)
             gshape.rounded_rect(cr, width, height, client_border_radius)
         end,
@@ -942,5 +942,29 @@ theme.snap = {
 }
 
 ----------------------------------------------------------------------------------------------------
+
+theme.tabbed_spawn_in_tab = false  -- whether a new client should spawn into the focused tabbing container
+
+-- For tabbar in general
+theme.tabbar_ontop  = true
+theme.tabbar_radius = 10                -- border radius of the tabbar
+theme.tabbar_style = "boxes"         -- style of the tabbar ("default", "boxes" or "modern")
+theme.tabbar_font = "Sans 2"          -- font of the tabbar
+theme.tabbar_size = 4                 -- size of the tabbar
+theme.tabbar_position = "bottom"          -- position of the tabbar
+theme.tabbar_bg_normal = "#000000"     -- background color of the focused client on the tabbar
+theme.tabbar_fg_normal = "#fff00f"     -- foreground color of the focused client on the tabbar
+theme.tabbar_bg_focus  = "#1A2026"     -- background color of unfocused clients on the tabbar
+theme.tabbar_fg_focus  = "#ff0000"     -- foreground color of unfocused clients on the tabbar
+theme.tabbar_bg_focus_inactive = nil   -- background color of the focused client on the tabbar when inactive
+theme.tabbar_fg_focus_inactive = nil   -- foreground color of the focused client on the tabbar when inactive
+theme.tabbar_bg_normal_inactive = nil  -- background color of unfocused clients on the tabbar when inactive
+theme.tabbar_fg_normal_inactive = nil  -- foreground color of unfocused clients on the tabbar when inactive
+theme.tabbar_disable = false           -- disable the tab bar entirely
+
+-- the following variables are currently only for the "modern" tabbar style
+theme.tabbar_color_close = "#f9929b" -- chnges the color of the close button
+theme.tabbar_color_min   = "#fbdf90" -- chnges the color of the minimize button
+theme.tabbar_color_float = "#ccaced" -- chnges the color of the float button
 
 return theme

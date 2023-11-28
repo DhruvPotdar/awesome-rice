@@ -167,13 +167,13 @@ ruled.notification.connect_signal("request::rules", function()
     ruled.notification.append_rule {
         rule = { urgency = "low" },
         properties = {
-            implicit_timeout = 8,
+            implicit_timeout = 3,
         },
     }
     ruled.notification.append_rule {
         rule = { urgency = "normal" },
         properties = {
-            implicit_timeout = 30,
+            implicit_timeout = 5,
         },
     }
     ruled.notification.append_rule {

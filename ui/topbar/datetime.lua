@@ -84,6 +84,7 @@ local function initialize_date_widget(self, style)
     date_container:apply_style(style)
     date_container.paddings = htable.crush_clone(date_container.paddings, {
         right = beautiful.capsule.item_spacing / 2,
+        left = beautiful.capsule.item_spacing / 2,
     })
     date_container.widget = self._private.date_widget
     date_container.buttons = binding.awful_buttons {
@@ -100,7 +101,7 @@ local function initialize_date_widget(self, style)
     local popup_placement = beautiful.wibar.build_placement(date_container, self._private.wibar)
 
     self._private.date_menu = mebox {
-        item_width = dpi(192),
+        item_width = dpi(190),
         placement = popup_placement,
         {
             text = "Copy Date",

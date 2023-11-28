@@ -15,8 +15,9 @@ local mebox = require("widget.mebox")
 local bindbox = require("widget.bindbox")
 local config = require("config")
 local hclient = require("utils.client")
-
-
+local hotkeys_popup = require("awful.hotkeys_popup")
+local bling = require("bling")
+local wibox = require("wibox")
 -- Available keys with `super` modifier: gstpzxcv jlyiok
 
 local main_bindbox = bindbox.new()
@@ -59,6 +60,35 @@ end)
 
 
 binding.add_global_range {
+
+
+    binding.new {
+        modifiers = { mod.super, mod.control },
+        triggers = "a",
+        path = "Tabs",
+        description = "Add client to Tabbing Group",
+        on_press = function()
+            bling.module.tabbed.pick()  
+        end,
+    },
+    binding.new {
+        modifiers = { mod.super, mod.control },
+        triggers = "d",
+        path = "Tabs",
+        description = "Remove client from Tabbing Group",
+        on_press = function()
+            bling.module.tabbed.pop()  
+        end,
+    },
+    binding.new {
+        modifiers = { mod.super, mod.control },
+        triggers = "s",
+        path = "Tabs",
+        description = "Remove client from Tabbing Group",
+        on_press = function()
+            bling.module.tabbed.pick_with_dmenu()  
+        end,
+    },
 
     binding.new {
         modifiers = { mod.super, mod.control },
@@ -116,7 +146,7 @@ binding.add_global_range {
         triggers = "h",
         path = "Awesome",
         description = "Keyboard shortcuts",
-        on_press = function() main_bindbox:show() end,
+        on_press =  hotkeys_popup.show_help ,
     },
 
     binding.new {
@@ -141,7 +171,8 @@ binding.add_global_range {
         triggers = "Return",
         path = "Launcher",
         description = "Terminal",
-        on_press = function() awful.spawn(config.apps.terminal) end,
+        -- on_press = function() awful.spawn(config.apps.terminal) end,
+        on_press = function() awful.spawn("alacritty") end,
     },
 
     binding.new {
@@ -267,7 +298,7 @@ binding.add_global_range {
     binding.new {
         modifiers = { mod.super },
         triggers = {
-            { trigger = ",", action = awful.tag.viewprev },
+            { trigger = ", ", action = awful.tag.viewprev },
             { trigger = ".", action = awful.tag.viewnext },
         },
         path = "Tag",
@@ -505,8 +536,8 @@ end
 binding.add_client_range {
 
     binding.new {
-        modifiers = { mod.super, mod.control },
-        triggers = "Escape",
+        modifiers = { mod.super },
+        triggers = "w",
         path = "Client",
         description = "Quit",
         order = 0,
@@ -574,25 +605,25 @@ binding.add_client_range {
         end,
     },
 
-    binding.new {
-        modifiers = { mod.super },
-        triggers = "w",
-        path = "Client",
-        description = "Show client menu",
-        on_press = function(_, client)
-            mebox(menu_templates.client.main.shared):show({
-                client = client,
-                placement = function(menu)
-                    aplacement.centered(menu, { parent = client })
-                    aplacement.no_offscreen(menu, {
-                        honor_workarea = true,
-                        honor_padding = false,
-                        margins = beautiful.popup.margins,
-                    })
-                end,
-            }, { source = "keyboard" })
-        end,
-    },
+    -- binding.new {
+    --     modifiers = { mod.super },
+    --     triggers = "t",
+    --     path = "Client",
+    --     description = "Show client menu",
+    --     on_press = function(_, client)
+    --         mebox(menu_templates.client.main.shared):show({
+    --             client = client,
+    --             placement = function(menu)
+    --                 aplacement.centered(menu, { parent = client })
+    --                 aplacement.no_offscreen(menu, {
+    --                     honor_workarea = true,
+    --                     honor_padding = false,
+    --                     margins = beautiful.popup.margins,
+    --                 })
+    --             end,
+    --         }, { source = "keyboard" })
+    --     end,
+    -- },
 
     binding.new {
         modifiers = { mod.shift, mod.super },
@@ -612,7 +643,7 @@ binding.add_client_range {
 
 
     binding.new {
-        modifiers = { mod.super },
+        modifiers = { mod.super, mod.shift },
         triggers = "t",
         path = { "Client", "Layer" },
         description = "Keep on top",
@@ -636,17 +667,17 @@ binding.add_client_range {
     },
 
 
-    binding.new {
-        modifiers = { mod.super },
-        triggers = "space",
-        path = { "Client", "State" },
-        description = "Toggle floating/tiling",
-        order = 0,
-        on_press = function(_, client)
-            client.floating = not client.floating
-            client:raise()
-        end,
-    },
+    -- binding.new {
+    --     modifiers = { mod.super },
+    --     triggers = "space",
+    --     path = { "Client", "State" },
+    --     description = "Toggle floating/tiling",
+    --     order = 0,
+    --     on_press = function(_, client)
+    --         client.floating = not client.floating
+    --         client:raise()
+    --     end,
+    -- },
 
 
     binding.new {
@@ -829,7 +860,63 @@ main_bindbox:add_group {
         },
     },
 }
+local gears = require("gears")
+local ll = awful.widget.layoutlist {
+    base_layout = wibox.widget {
+        spacing         = 5,
+        forced_num_cols = 5,
+        layout          = wibox.layout.grid.vertical,
+    },
+    widget_template = {
+        {
+            {
+                id            = 'icon_role',
+                forced_height = 22,
+                forced_width  = 22,
+                widget        = wibox.widget.imagebox,
+            },
+            margins = 4,
+            widget  = wibox.container.margin,
+        },
+        id              = 'background_role',
+        forced_width    = 24,
+        forced_height   = 24,
+        shape           = gears.shape.rounded_rect,
+        widget          = wibox.container.background,
+    },
+}
 
+local layout_popup = awful.popup {
+    widget = wibox.widget {
+        ll,
+        margins = 4,
+        widget  = wibox.container.margin,
+    },
+    border_color = beautiful.border_color,
+    border_width = beautiful.border_width,
+    placement    = awful.placement.centered,
+    ontop        = true,
+    visible      = false,
+    shape        = gears.shape.rounded_rect
+}
+
+-- Make sure you remove the default Mod4+Space and Mod4+Shift+Space
+-- keybindings before adding this.
+awful.keygrabber {
+    start_callback = function() layout_popup.visible = true  end,
+    stop_callback  = function() layout_popup.visible = false end,
+    export_keybindings = true,
+    release_event = 'release',
+    stop_key = {'Escape', 'Super_L', 'Super_R'},
+    keybindings = {
+        {{ mod.super          } , 'l' , function()
+            awful.layout.set(gears.table.iterate_value(ll.layouts, ll.current_layout, 1))
+        end},
+        {{ mod.super, 'Shift' } , 'l' , function()
+            awful.layout.set(gears.table.iterate_value(ll.layouts, ll.current_layout, -1), nil)
+        end},
+    }
+}
 return {
     main_bindbox = main_bindbox,
 }

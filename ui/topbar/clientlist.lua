@@ -158,8 +158,8 @@ function clientlist.new(wibar)
         },
         layout = {
             layout = wibox.container.margin,
-            left = -beautiful.wibar.spacing / 2,
-            right = -beautiful.wibar.spacing / 2,
+            left = -beautiful.wibar.spacing / 3,
+            right = -beautiful.wibar.spacing / 3,
             {
                 layout = wibox.layout.fixed.horizontal,
             },
