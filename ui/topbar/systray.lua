@@ -25,6 +25,7 @@ function systray.new(wibar)
             left = beautiful.capsule.default_style.margins.left,
         },
         paddings = hui.new { dpi(4), dpi(10) },
+        paddings = hui.thickness { dpi(1), dpi(5) },
         wibox.widget.systray(),
     }
 

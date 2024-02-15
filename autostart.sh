@@ -10,6 +10,9 @@ run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 run /usr/lib/kactivitymanagerd
 run /usr/bin/kglobalaccel5
 run nm-applet
-run parcellite
-run picom --experimental-backend --config $HOME/.config/awesome/picom.conf
+# run parcellite
+run blueman-applet
+run xfce4-power-manager
+# run picom --experimental-backend --config $HOME/.config/awesome/picom.conf
+picom 
 spotifyd --no-daemon

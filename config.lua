@@ -10,8 +10,8 @@ config.features = {
     magnifier_tools = false,
     torrent_widget = false,
     weather_widget = false,
-    redshift_widget = true,
-    wallpaper_menu = false,
+    redshift_widget = false,
+    wallpaper_menu = true,
 }
 
 config.places = {}
@@ -26,14 +26,14 @@ config.wm = {
     name = "awesome",
 }
 
-local terminal = "alacritty"
+local terminal = "kitty"
 local terminal_execute = terminal .. " -e "
 
 config.apps = {
     shell = "fish",
     terminal = terminal,
     editor = terminal_execute .. "code",
-    browser = "brave-browser",
+    browser = "microsoft-edge",
     private_browser = "librewolf --private-window",
     file_manager = "dolphin",
     calculator = "kcalc",

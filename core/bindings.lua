@@ -172,7 +172,7 @@ binding.add_global_range {
         path = "Launcher",
         description = "Terminal",
         -- on_press = function() awful.spawn(config.apps.terminal) end,
-        on_press = function() awful.spawn("alacritty") end,
+        on_press = function() awful.spawn("kitty") end,
     },
 
     binding.new {
@@ -630,7 +630,7 @@ binding.add_client_range {
         triggers = binding.group.arrows,
         path = "Client",
         description = "Move",
-        on_press = function(trigger, client) hclient.move(client, trigger.direction) end,
+        on_press = function(trigger, client) client.move(client, trigger.direction) end,
     },
 
     binding.new {
@@ -638,7 +638,7 @@ binding.add_client_range {
         triggers = binding.group.arrows,
         path = "Client",
         description = "Resize",
-        on_press = function(trigger, client) hclient.resize(client, trigger.direction) end,
+        on_press = function(trigger, client) client.resize(client, trigger.direction) end,
     },
 
 
@@ -711,13 +711,7 @@ binding.add_client_range {
     },
 
 
-    binding.new {
-        modifiers = { mod.super, mod.shift },
-        triggers = "s",
-        path = { "Tag", "Client" },
-        description = "Keep on all tags (sticky)",
-        on_press = function(_, client) client.sticky = not client.sticky end,
-    },
+
 
 }
 

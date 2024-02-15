@@ -22,8 +22,7 @@ local theme = {}
 
 ----------------------------------------------------------------------------------------------------
 
-theme.gap = dpi(6)
-theme.edge_gap = dpi(32)
+theme.gap = dpi(2)
 
 ----------------------------------------------------------------------------------------------------
 
@@ -68,7 +67,7 @@ end
 -- Tomorrow Night (https://github.com/chriskempson/tomorrow-theme)
 theme.palette = setmetatable({
     black          = "#0d1017",
-    white          = "#c5c8c6",
+    white          = "#ffffff",
     red            = "#cc6666",
     orange         = "#de935f",
     yellow         = "#32b8e6",
@@ -171,8 +170,8 @@ end
 theme.capsule = {
     -- TODO: Move these into `default_style`?
     item_content_spacing = dpi(8),
-    item_spacing = dpi(16),
-    bar_width = dpi(80),
+    item_spacing = dpi(10),
+    bar_width = dpi(40),
     bar_height = dpi(12),
     border_radius = dpi(8),
 }
@@ -187,8 +186,8 @@ theme.capsule.default_style = {
     shape = function(cr, width, height)
         gshape.rounded_rect(cr, width, height, theme.capsule.border_radius)
     end,
-    margins = hui.new { 0 },
-    paddings = hui.new { dpi(6), dpi(14) },
+    margins = hui.thickness { 0 },
+    paddings = hui.thickness { dpi(1), dpi(10) },
 }
 
 theme.capsule.styles = {
@@ -666,8 +665,8 @@ theme.clientlist.item = {
 
 ----------------------------------------------------------------------------------------------------
 
-local client_border_width = dpi(3)
-local client_border_radius = dpi(12)
+local client_border_width = dpi(2)
+local client_border_radius = dpi(6)
 
 theme.client = {
     normal = {
@@ -887,7 +886,7 @@ theme.application = {
 
 theme.systray = {
     bg = theme.capsule.default_style.bg,
-    spacing = dpi(12),
+    spacing = dpi(5),
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -908,28 +907,28 @@ theme.snap = {
 
 ----------------------------------------------------------------------------------------------------
 
-theme.tabbed_spawn_in_tab = false  -- whether a new client should spawn into the focused tabbing container
+-- theme.tabbed_spawn_in_tab = true  -- whether a new client should spawn into the focused tabbing container
 
--- For tabbar in general
-theme.tabbar_ontop  = true
-theme.tabbar_radius = 10                -- border radius of the tabbar
-theme.tabbar_style = "boxes"         -- style of the tabbar ("default", "boxes" or "modern")
-theme.tabbar_font = "Sans 2"          -- font of the tabbar
-theme.tabbar_size = 4                 -- size of the tabbar
-theme.tabbar_position = "bottom"          -- position of the tabbar
-theme.tabbar_bg_normal = "#000000"     -- background color of the focused client on the tabbar
-theme.tabbar_fg_normal = "#fff00f"     -- foreground color of the focused client on the tabbar
-theme.tabbar_bg_focus  = "#1A2026"     -- background color of unfocused clients on the tabbar
-theme.tabbar_fg_focus  = "#ff0000"     -- foreground color of unfocused clients on the tabbar
-theme.tabbar_bg_focus_inactive = nil   -- background color of the focused client on the tabbar when inactive
-theme.tabbar_fg_focus_inactive = nil   -- foreground color of the focused client on the tabbar when inactive
-theme.tabbar_bg_normal_inactive = nil  -- background color of unfocused clients on the tabbar when inactive
-theme.tabbar_fg_normal_inactive = nil  -- foreground color of unfocused clients on the tabbar when inactive
-theme.tabbar_disable = false           -- disable the tab bar entirely
+-- -- For tabbar in general
+-- theme.tabbar_ontop  = true
+-- theme.tabbar_radius = 10                -- border radius of the tabbar
+-- theme.tabbar_style = "modern"         -- style of the tabbar ("default", "boxes" or "modern")
+-- theme.tabbar_font = "Sans 20"          -- font of the tabbar
+-- theme.tabbar_size = 40              -- size of the tabbar
+-- theme.tabbar_position = "bottom"          -- position of the tabbar
+-- theme.tabbar_bg_normal = "#0000ff"     -- background color of the focused client on the tabbar
+-- theme.tabbar_fg_normal = "#fff00f"     -- foreground color of the focused client on the tabbar
+-- theme.tabbar_bg_focus  = "#1A2026"     -- background color of unfocused clients on the tabbar
+-- theme.tabbar_fg_focus  = "#ff0000"     -- foreground color of unfocused clients on the tabbar
+-- theme.tabbar_bg_focus_inactive = nil   -- background color of the focused client on the tabbar when inactive
+-- theme.tabbar_fg_focus_inactive = nil   -- foreground color of the focused client on the tabbar when inactive
+-- theme.tabbar_bg_normal_inactive = nil  -- background color of unfocused clients on the tabbar when inactive
+-- theme.tabbar_fg_normal_inactive = nil  -- foreground color of unfocused clients on the tabbar when inactive
+-- theme.tabbar_disable = false           -- disable the tab bar entirely
 
--- the following variables are currently only for the "modern" tabbar style
-theme.tabbar_color_close = "#f9929b" -- chnges the color of the close button
-theme.tabbar_color_min   = "#fbdf90" -- chnges the color of the minimize button
-theme.tabbar_color_float = "#ccaced" -- chnges the color of the float button
+-- -- the following variables are currently only for the "modern" tabbar style
+-- theme.tabbar_color_close = "#f9929b" -- chnges the color of the close button
+-- theme.tabbar_color_min   = "#fbdf90" -- chnges the color of the minimize button
+-- theme.tabbar_color_float = "#ccaced" -- chnges the color of the float button
 
 return theme
