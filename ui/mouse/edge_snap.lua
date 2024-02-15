@@ -14,7 +14,7 @@ local gshape = require("gears.shape")
 local wibox = require("wibox")
 local cairo = require("lgi").cairo
 local beautiful = require("theme.theme")
-local uui = require("utils.ui")
+local uui = require("utils.thickness")
 
 local M = {}
 
@@ -97,7 +97,7 @@ local function update(client)
     local sg = client.screen.geometry
 
     local distance = beautiful.snap.edge.distance or 10
-    local gap = uui.thickness(beautiful.snap.gap or 5) * 2
+    local gap = uui.new(beautiful.snap.gap or 5) * 2
 
     local v, h
 

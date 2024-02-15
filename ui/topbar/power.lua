@@ -4,8 +4,8 @@ local maxinteger = math.maxinteger
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local pango = require("utils.pango")
 local css = require("utils.css")
 local mod = binding.modifier
@@ -16,8 +16,9 @@ local gtable = require("gears.table")
 local mebox = require("widget.mebox")
 local power_menu_template = require("ui.menu.templates.power")
 local power_service = require("services.power")
+local power = require("rice.power")
 local humanizer = require("utils.humanizer")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local power_widget = { mt = {} }
@@ -39,7 +40,7 @@ local time_args = {
 
 function power_widget:refresh(status)
     local style = status
-        and (((tonumber(status) or maxinteger) <= power_service.config.alert_threshold)
+        and (((tonumber(status) or maxinteger) <= power.timer.alert_threshold)
             and beautiful.capsule.styles.palette.red
             or beautiful.capsule.styles.palette.orange)
         or beautiful.capsule.styles.normal
@@ -67,13 +68,13 @@ end
 function power_widget.new(wibar)
     local self = wibox.widget {
         widget = capsule,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.wibar.paddings.right,
             bottom = beautiful.wibar.paddings.bottom,
             left = beautiful.capsule.default_style.margins.left,
         },
-        paddings = hui.thickness {
+        paddings = hui.new {
             top = beautiful.capsule.default_style.paddings.top,
             right = dpi(10),
             bottom = beautiful.capsule.default_style.paddings.bottom,
@@ -84,7 +85,7 @@ function power_widget.new(wibar)
             {
                 id = "#icon",
                 widget = wibox.widget.imagebox,
-                image = config.places.theme .. "/icons/power.svg",
+                image = beautiful.icon("power.svg"),
             },
             {
                 id = "#text",

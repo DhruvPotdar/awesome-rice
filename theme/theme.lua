@@ -9,12 +9,12 @@ local gshape = require("gears.shape")
 local gtable = require("gears.table")
 local wibox = require("wibox")
 local hcolor = require("utils.color")
-local hui = require("utils.ui")
-local hwidget = require("utils.widget")
+local hui = require("utils.thickness")
+local hwidget = require("core.widget")
 local css = require("utils.css")
 local pango = require("utils.pango")
-local config = require("config")
-local noice = require("theme.style")
+local noice = require("core.style")
+local core = require("core")
 
 
 ---@class Theme
@@ -22,7 +22,8 @@ local theme = {}
 
 ----------------------------------------------------------------------------------------------------
 
-theme.gap = dpi(3)
+theme.gap = dpi(6)
+theme.edge_gap = dpi(32)
 
 ----------------------------------------------------------------------------------------------------
 
@@ -119,6 +120,17 @@ end
 
 ----------------------------------------------------------------------------------------------------
 
+function theme.icon(path)
+    if path == false then
+        path = "_blank.svg"
+    elseif type(path) ~= "string" then
+        return nil
+    end
+    return string.format("%s/icons/%s", core.path.theme, path)
+end
+
+----------------------------------------------------------------------------------------------------
+
 function theme.get_progressbar_bg(color)
     -- TODO: Solid color instead of alpha
     return hcolor.change(color, { alpha = 0.25 })
@@ -133,8 +145,8 @@ theme.screen_selection_color = hcolor.change(theme.common.primary, { alpha = 0.2
 
 theme.wibar = {
     bg = theme.common.bg,
-    spacing = dpi(6),
-    paddings = hui.thickness { dpi(4), dpi(8) },
+    spacing = dpi(12),
+    paddings = hui.new { dpi(8), dpi(16) },
 }
 
 theme.wibar.item_height = dpi(27)
@@ -175,8 +187,8 @@ theme.capsule.default_style = {
     shape = function(cr, width, height)
         gshape.rounded_rect(cr, width, height, theme.capsule.border_radius)
     end,
-    margins = hui.thickness { 0 },
-    paddings = hui.thickness { dpi(6), dpi(14) },
+    margins = hui.new { 0 },
+    paddings = hui.new { dpi(6), dpi(14) },
 }
 
 theme.capsule.styles = {
@@ -243,7 +255,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 theme.popup = {
-    margins = hui.thickness { dpi(6) },
+    margins = hui.new { dpi(6) },
 }
 
 theme.popup.default_style = {
@@ -255,7 +267,7 @@ theme.popup.default_style = {
         gshape.rounded_rect(cr, width, height, dpi(12))
     end,
     placement = aplacement.under_mouse,
-    paddings = hui.thickness { dpi(20) },
+    paddings = hui.new { dpi(20) },
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -272,14 +284,26 @@ theme.notification.default_style = setmetatable({
     header_bg = theme.common.bg_75,
     header_fg = theme.common.fg_bright,
     header_border_color = theme.common.bg_bright,
-    header_paddings = hui.thickness { dpi(12), dpi(16) },
-    placement = false,
-    paddings = hui.thickness { dpi(16) },
+    header_paddings = hui.new { dpi(12), dpi(16) },
+    paddings = hui.new { dpi(16) },
     icon_spacing = dpi(12),
     timer_height = dpi(3),
     timer_bg = theme.common.secondary_66,
-    actions_paddings = hui.thickness { dpi(16), top = 0 },
+    actions_paddings = hui.new { dpi(16), top = 0 },
     actions_spacing = dpi(8),
+    close_button_size = dpi(22),
+    close_button_margins = hui.new { dpi(10), left = 0, right = dpi(16) },
+    close_button = {
+        hover_overlay = theme.common.urgent_bright .. "50",
+        press_overlay = theme.palette.white .. "30",
+        bg = noice.value.Default,
+        fg = noice.value.Default,
+        border_width = 0,
+        shape = function(cr, width, height)
+            gshape.rounded_rect(cr, width, height, dpi(3))
+        end,
+        paddings = hui.new { dpi(3) },
+    },
 }, { __index = theme.popup.default_style })
 
 theme.notification.styles = {
@@ -296,8 +320,8 @@ theme.tooltip.default_style = setmetatable({
     bg = theme.common.bg_33,
     border_width = dpi(1),
     shape = false,
-    margins = hui.thickness { dpi(0) },
-    paddings = hui.thickness { dpi(12), dpi(16) },
+    margins = hui.new { dpi(0) },
+    paddings = hui.new { dpi(12), dpi(16) },
 }, { __index = theme.popup.default_style })
 
 ----------------------------------------------------------------------------------------------------
@@ -305,41 +329,41 @@ theme.tooltip.default_style = setmetatable({
 theme.mebox = {
     checkmark = {
         [false] = {
-            icon = config.places.theme .. "/icons/_blank.svg",
+            icon = theme.icon("_blank.svg"),
             color = theme.palette.gray,
         },
         [true] = {
-            icon = config.places.theme .. "/icons/check.svg",
+            icon = theme.icon("check.svg"),
             color = theme.common.fg,
         },
     },
     checkbox = {
         [false] = {
-            icon = config.places.theme .. "/icons/checkbox-blank-outline.svg",
+            icon = theme.icon("checkbox-blank-outline.svg"),
             color = theme.palette.gray,
         },
         [true] = {
-            icon = config.places.theme .. "/icons/checkbox-marked.svg",
+            icon = theme.icon("checkbox-marked.svg"),
             color = theme.palette.gray_bright,
         },
     },
     radiobox = {
         [false] = {
-            icon = config.places.theme .. "/icons/radiobox-blank.svg",
+            icon = theme.icon("radiobox-blank.svg"),
             color = theme.palette.gray,
         },
         [true] = {
-            icon = config.places.theme .. "/icons/radiobox-marked.svg",
+            icon = theme.icon("radiobox-marked.svg"),
             color = theme.palette.gray_bright,
         },
     },
     switch = {
         [false] = {
-            icon = config.places.theme .. "/icons/toggle-switch-off-outline.svg",
+            icon = theme.icon("toggle-switch-off-outline.svg"),
             color = theme.palette.gray,
         },
         [true] = {
-            icon = config.places.theme .. "/icons/toggle-switch.svg",
+            icon = theme.icon("toggle-switch.svg"),
             color = theme.palette.gray_bright,
         },
     },
@@ -388,7 +412,7 @@ theme.mebox.default_style = setmetatable({
     submenu_offset = dpi(4),
     active_opacity = 1,
     inactive_opacity = 1,
-    paddings = hui.thickness { dpi(8) },
+    paddings = hui.new { dpi(8) },
     item_width = dpi(128),
     item_height = dpi(36),
 }, { __index = theme.popup.default_style })
@@ -406,7 +430,7 @@ theme.bindbox.default_style = setmetatable({
             honor_padding = false,
         })
     end,
-    page_paddings = hui.thickness { dpi(8), bottom = dpi(16) },
+    page_paddings = hui.new { dpi(8), bottom = dpi(16) },
     page_width = dpi(1400),
     page_height = dpi(1000),
     page_columns = 2,
@@ -431,7 +455,7 @@ theme.bindbox.default_style = setmetatable({
     status_fg = theme.capsule.styles.nested.fg,
     status_border_color = theme.capsule.styles.nested.border_color,
     status_border_width = theme.capsule.styles.nested.border_width,
-    status_paddings = hui.thickness { dpi(12), dpi(16) },
+    status_paddings = hui.new { dpi(12), dpi(16) },
     status_spacing = dpi(24),
     find_placeholder_fg = theme.common.fg_66,
     find_cursor_bg = theme.common.secondary_66,
@@ -466,10 +490,10 @@ theme.volume_osd = {
         placement = function(d)
             aplacement.top(d, {
                 honor_workarea = true,
-                margins = hui.thickness { dpi(32) },
+                margins = hui.new { dpi(32) },
             })
         end,
-        paddings = hui.thickness { dpi(16), dpi(32) },
+        paddings = hui.new { dpi(16), dpi(32) },
     }, { __index = theme.popup.default_style }),
 }
 
@@ -553,14 +577,14 @@ do
             widget.markup = pango.span { fgcolor = theme.common.fg_50, weight = "bold", widget.text, " " }
             return wibox.widget {
                 widget = wibox.container.margin,
-                margins = hui.thickness { dpi(6), 0 },
+                margins = hui.new { dpi(6), 0 },
                 widget,
             }
         elseif flag == "weekday" then
             widget.halign = "center"
             return wibox.widget {
                 widget = wibox.container.margin,
-                margins = hui.thickness { dpi(2), dpi(4) },
+                margins = hui.new { dpi(2), dpi(4) },
                 widget,
             }
         elseif flag == "monthheader" or flag == "header" then
@@ -568,7 +592,7 @@ do
             widget.markup = pango.b(widget.text)
             return wibox.widget {
                 widget = wibox.container.margin,
-                margins = hui.thickness { dpi(6), 0, dpi(14) },
+                margins = hui.new { dpi(6), 0, dpi(14) },
                 widget,
             }
         elseif flag == "month" then
@@ -678,22 +702,22 @@ do
     local button_shape = function(cr, width, height)
         gshape.rounded_rect(cr, width, height, dpi(3))
     end
-    local button_paddings = hui.thickness { dpi(3) }
-    local button_margins = hui.thickness { 0 }
+    local button_paddings = hui.new { dpi(3) }
+    local button_margins = hui.new { 0 }
 
     theme.titlebar.default = {
         height = dpi(32),
-        border_width = dpi(1),
-        paddings = hui.thickness { dpi(6), dpi(8) },
+        border_width = dpi(3),
+        paddings = hui.new { dpi(6), dpi(8) },
         spacing = dpi(4),
         icons = {
-            menu = config.places.theme .. "/icons/menu.svg",
-            floating = config.places.theme .. "/icons/arrange-bring-forward.svg",
-            on_top = config.places.theme .. "/icons/chevron-double-up.svg",
-            sticky = config.places.theme .. "/icons/pin.svg",
-            minimize = config.places.theme .. "/icons/window-minimize.svg",
-            maximize = config.places.theme .. "/icons/window-maximize.svg",
-            close = config.places.theme .. "/icons/window-close.svg",
+            menu = theme.icon("menu.svg"),
+            floating = theme.icon("arrange-bring-forward.svg"),
+            on_top = theme.icon("chevron-double-up.svg"),
+            sticky = theme.icon("pin.svg"),
+            minimize = theme.icon("window-minimize.svg"),
+            maximize = theme.icon("window-maximize.svg"),
+            close = theme.icon("window-close.svg"),
         },
         buttons = {
             default = {
@@ -778,8 +802,8 @@ do
     local button_shape = function(cr, width, height)
         gshape.rounded_rect(cr, width, height, dpi(2))
     end
-    local button_paddings = hui.thickness { dpi(1) }
-    local button_margins = hui.thickness { 0 }
+    local button_paddings = hui.new { dpi(1) }
+    local button_margins = hui.new { 0 }
 
     local function clone_button_style(style)
         return setmetatable({
@@ -792,7 +816,7 @@ do
     theme.titlebar.toolbox = {
         height = dpi(24),
         border_width = dpi(3),
-        paddings = hui.thickness { dpi(4), dpi(10) },
+        paddings = hui.new { dpi(4), dpi(10) },
         spacing = dpi(4),
         icons = theme.titlebar.default.icons,
         buttons = {
@@ -833,89 +857,30 @@ function theme.build_layout_stylesheet(color)
     }
 end
 
-theme.layout_icons = {
-    tile = config.places.theme .. "/icons/layouts/tile.right.svg",
-    floating = config.places.theme .. "/icons/layouts/floating.svg",
-    max = config.places.theme .. "/icons/layouts/max.svg",
-    fullscreen = config.places.theme .. "/icons/layouts/fullscreen.svg",
+theme.layouts = {
+    tiling = {
+        text = "Tiling",
+        icon = theme.icon("layouts/tiling.right.svg"),
+    },
+    floating = {
+        text = "Floating",
+        icon = theme.icon("layouts/floating.svg"),
+    },
+    max = {
+        text = "Maximize",
+        icon = theme.icon("layouts/max.svg"),
+    },
+    fullscreen = {
+        text = "Fullscreen",
+        icon = theme.icon("layouts/fullscreen.svg"),
+    },
 }
 
 ----------------------------------------------------------------------------------------------------
 
 theme.application = {
-    ---@type string|nil # The default icon for applications that don't provide any icon in their .desktop files.
+    ---@type string? # The default icon for applications that don't provide any icon in their desktop file.
     default_icon = nil,
-    fallback_category = {
-        name = "Other",
-    },
-    categories = {
-        utility = {
-            id = "Utility",
-            name = "Accessories",
-            icon_name = "applications-accessories",
-            icon_color = theme.palette.green,
-        },
-        development = {
-            id = "Development",
-            name = "Development",
-            icon_name = "applications-development",
-            icon_color = theme.palette.cyan,
-        },
-        education = {
-            id = "Education",
-            name = "Education",
-            icon_name = "applications-science",
-            icon_color = theme.palette.gray,
-        },
-        games = {
-            id = { "Game", "Games" },
-            name = "Games",
-            icon_name = "applications-games",
-            icon_color = theme.palette.red,
-        },
-        graphics = {
-            id = "Graphics",
-            name = "Graphics",
-            icon_name = "applications-graphics",
-            icon_color = theme.palette.yellow,
-        },
-        internet = {
-            id = "Network",
-            name = "Internet",
-            icon_name = "applications-internet",
-            icon_color = theme.palette.blue,
-        },
-        multimedia = {
-            id = "AudioVideo",
-            name = "Multimedia",
-            icon_name = "applications-multimedia",
-            icon_color = theme.palette.cyan,
-        },
-        office = {
-            id = "Office",
-            name = "Office",
-            icon_name = "applications-office",
-            icon_color = theme.palette.white,
-        },
-        science = {
-            id = "Science",
-            name = "Science",
-            icon_name = "applications-science",
-            icon_color = theme.palette.magenta,
-        },
-        settings = {
-            id = "Settings",
-            name = "Settings",
-            icon_name = "applications-utilities",
-            icon_color = theme.palette.orange,
-        },
-        tools = {
-            id = "System",
-            name = "System Tools",
-            icon_name = "applications-system",
-            icon_color = theme.palette.gray,
-        },
-    },
 }
 
 ----------------------------------------------------------------------------------------------------

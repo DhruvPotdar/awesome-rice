@@ -28,6 +28,22 @@ local button = {
 
 local key = {
     any = "Any",
+    backspace = "BackSpace",
+    tab = "Tab",
+    enter = "Return",
+    escape = "Escape",
+    space = "space",
+    prtsc = "Print",
+    pause = "Pause",
+    insert = "Insert",
+    home = "Home",
+    pgup = "Prior",
+    pgdn = "Next",
+    delete = "Delete",
+    end_ = "End",
+    capslock = "Caps_Lock",
+    numlock = "Num_Lock",
+    scrolllock = "Scroll_Lock",
 }
 
 local modifier = {
@@ -67,19 +83,42 @@ local modifier = {
 
 ---@class _Binding
 ---@field awesome_bindings Binding[]
-local binding = {
+local M = {
     awesome_bindings = {},
     trigger_type = trigger_type,
     button = button,
     modifier = modifier,
+    key = key,
     group = {
         fkeys = {
             from = "F1",
-            to = "F35",
+            to = "F12",
+            { trigger = "F1", index = 1 },
+            { trigger = "F2", index = 2 },
+            { trigger = "F3", index = 3 },
+            { trigger = "F4", index = 4 },
+            { trigger = "F5", index = 5 },
+            { trigger = "F6", index = 6 },
+            { trigger = "F7", index = 7 },
+            { trigger = "F8", index = 8 },
+            { trigger = "F9", index = 9 },
+            { trigger = "F10", index = 10 },
+            { trigger = "F11", index = 11 },
+            { trigger = "F12", index = 12 },
         },
         numrow = {
             from = "#19",
             to = "#18",
+            { trigger = "#10", index = 1, number = 1 },
+            { trigger = "#11", index = 2, number = 2 },
+            { trigger = "#12", index = 3, number = 3 },
+            { trigger = "#13", index = 4, number = 4 },
+            { trigger = "#14", index = 5, number = 5 },
+            { trigger = "#15", index = 6, number = 6 },
+            { trigger = "#16", index = 7, number = 7 },
+            { trigger = "#17", index = 8, number = 8 },
+            { trigger = "#18", index = 9, number = 9 },
+            { trigger = "#19", index = 10, number = 0 },
         },
         numpad = {
             from = "#90",
@@ -113,16 +152,16 @@ local binding = {
             { trigger = button.wheel_up, direction = "up", y = 1 },
             { trigger = button.wheel_down, direction = "down", y = -1 },
         },
+        vim_updown = {
+            { trigger = "k", direction = "up", y = 1 },
+            { trigger = "j", direction = "down", y = -1 },
+        },
+        vim_leftright = {
+            { trigger = "h", direction = "left", x = -1 },
+            { trigger = "l", direction = "right", x = 1 },
+        },
     },
 }
-
-for i = 1, 10 do
-    table.insert(binding.group.numrow, { trigger = "#" .. i + 9, index = i, number = i == 10 and 0 or i })
-end
-
-for i = 1, 12 do
-    table.insert(binding.group.fkeys, { trigger = "F" .. i, index = i })
-end
 
 do
     ---@type { length: integer, [key_modifier]: integer }
@@ -130,7 +169,7 @@ do
 
     ---@param modifiers? key_modifier[]
     ---@return integer|nil # Returns a hash value for a set of modifiers.
-    function binding.get_modifiers_hash(modifiers)
+    function M.get_modifiers_hash(modifiers)
         if not modifiers then
             return 0
         end
@@ -154,9 +193,9 @@ do
     ---@param required? key_modifier[] # A set of required modifiers.
     ---@param exact_match? boolean # If `true` then both `required` and `actual` must contain exactly the same set of modifiers. Otherwise `actual` must contain all `required` modifiers (other modifiers in `actual` will be ignored). Default: `true`
     ---@return boolean
-    function binding.match_modifiers(actual, required, exact_match)
-        local required_hash = binding.get_modifiers_hash(required)
-        local actual_hash = binding.get_modifiers_hash(actual)
+    function M.match_modifiers(actual, required, exact_match)
+        local required_hash = M.get_modifiers_hash(required)
+        local actual_hash = M.get_modifiers_hash(actual)
 
         if required_hash == -1 and actual_hash > 0 then
             return true
@@ -174,22 +213,22 @@ end
 ---@param required_button? button
 ---@param actual_modifiers? key_modifier[]
 ---@param required_modifiers? key_modifier[]
-function binding.match_button(actual_button, required_button, actual_modifiers, required_modifiers)
+function M.match_button(actual_button, required_button, actual_modifiers, required_modifiers)
     if required_button ~= button.any and required_button ~= actual_button then
         return false
     end
-    return binding.match_modifiers(actual_modifiers, required_modifiers)
+    return M.match_modifiers(actual_modifiers, required_modifiers)
 end
 
 ---@param actual_key key
 ---@param required_key? key
 ---@param actual_modifiers? key_modifier[]
 ---@param required_modifiers? key_modifier[]
-function binding.match_key(actual_key, required_key, actual_modifiers, required_modifiers)
+function M.match_key(actual_key, required_key, actual_modifiers, required_modifiers)
     if required_key ~= key.any and required_key ~= actual_key then
         return false
     end
-    return binding.match_modifiers(actual_modifiers, required_modifiers)
+    return M.match_modifiers(actual_modifiers, required_modifiers)
 end
 
 ---@param self Binding
@@ -250,7 +289,7 @@ end
 
 ---@param args Binding.new.args
 ---@return Binding
-function binding.new(args)
+function M.new(args)
     ---@type Binding
     local self = {
         on_press = args.on_press,
@@ -312,8 +351,8 @@ end
 
 ---@param b Binding
 ---@return Binding
-function binding.add_global(b)
-    table.insert(binding.awesome_bindings, b)
+function M.add_global(b)
+    table.insert(M.awesome_bindings, b)
     _ensure_awful_bindings(b)
     awful.keyboard.append_global_keybindings(b._awful.keys)
     awful.mouse.append_global_mousebindings(b._awful.buttons)
@@ -322,8 +361,8 @@ end
 
 ---@param b Binding
 ---@return Binding
-function binding.add_client(b)
-    table.insert(binding.awesome_bindings, b)
+function M.add_client(b)
+    table.insert(M.awesome_bindings, b)
     _ensure_awful_bindings(b)
     awful.keyboard.append_client_keybindings(b._awful.keys)
     awful.mouse.append_client_mousebindings(b._awful.buttons)
@@ -331,16 +370,16 @@ function binding.add_client(b)
 end
 
 ---@param bindings Binding[]
-function binding.add_global_range(bindings)
+function M.add_global_range(bindings)
     for _, b in ipairs(bindings) do
-        binding.add_global(b)
+        M.add_global(b)
     end
 end
 
 ---@param bindings Binding[]
-function binding.add_client_range(bindings)
+function M.add_client_range(bindings)
     for _, b in ipairs(bindings) do
-        binding.add_client(b)
+        M.add_client(b)
     end
 end
 
@@ -350,12 +389,12 @@ end
 ---@param on_release? fun(trigger: BindingTrigger, ...)
 ---@param args? table
 ---@return Binding
-function binding.awful(modifiers, triggers, on_press, on_release, args)
+function M.awful(modifiers, triggers, on_press, on_release, args)
     if type(on_release) == "table" then
         args = on_release
         on_release = nil
     end
-    return binding.new(gtable.crush({
+    return M.new(gtable.crush({
         on_press = on_press,
         on_release = on_release,
         modifiers = modifiers,
@@ -365,7 +404,7 @@ end
 
 ---@param bindings Binding[]
 ---@return awful.key[]
-function binding.awful_keys(bindings)
+function M.awful_keys(bindings)
     return gtable.join(table.unpack(gtable.map(function(b)
         _ensure_awful_bindings(b)
         return b._awful.keys
@@ -374,7 +413,7 @@ end
 
 ---@param bindings Binding[]
 ---@return awful.button[]
-function binding.awful_buttons(bindings)
+function M.awful_buttons(bindings)
     return gtable.join(table.unpack(gtable.map(function(b)
         _ensure_awful_bindings(b)
         return b._awful.buttons
@@ -383,11 +422,11 @@ end
 
 ---@param bindings Binding[]
 ---@return awful.hook[]
-function binding.awful_hooks(bindings)
+function M.awful_hooks(bindings)
     return gtable.join(table.unpack(gtable.map(function(b)
         _ensure_awful_bindings(b)
         return b._awful.hooks
     end, bindings)))
 end
 
-return binding
+return M

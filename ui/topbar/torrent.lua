@@ -1,4 +1,4 @@
-local config = require("config")
+local config = require("rice.config")
 if not config.features.torrent_widget then
     return
 end
@@ -11,7 +11,7 @@ local max = math.max
 local format = string.format
 local awful = require("awful")
 local wibox = require("wibox")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -21,11 +21,11 @@ local humanizer = require("utils.humanizer")
 local gtable = require("gears.table")
 local capsule = require("widget.capsule")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local mebox = require("widget.mebox")
 local pango = require("utils.pango")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local file_size_units = setmetatable({ space = pango.thin_space }, { __index = humanizer.file_size_units })
@@ -115,7 +115,7 @@ function torrent_widget:refresh()
     local text_widget = self:get_children_by_id("text")[1]
     text_widget:set_markup(pango.span { fgcolor = style.fg, text })
 
-    local icon_path = config.places.theme .. "/icons/" .. icon .. ".svg"
+    local icon_path = beautiful.icon(icon .. ".svg")
     local icon_stylesheet = css.style { path = { fill = style.fg } }
     local icon_widget = self:get_children_by_id("icon")[1]
     icon_widget:set_stylesheet(icon_stylesheet)
@@ -125,7 +125,7 @@ end
 function torrent_widget.new(wibar)
     local self = wibox.widget {
         widget = capsule,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.capsule.default_style.margins.right,
             bottom = beautiful.wibar.paddings.bottom,
@@ -155,38 +155,38 @@ function torrent_widget.new(wibar)
         placement = beautiful.wibar.build_placement(self, self._private.wibar),
         {
             text = "Open Transmission",
-            icon = config.places.theme .. "/icons/open-in-new.svg",
+            icon = beautiful.icon("open-in-new.svg"),
             icon_color = beautiful.palette.gray,
-            callback = function() awful.spawn.spawn(config.commands.open("http://localhost:9091/transmission/web/")) end,
+            callback = function() awful.spawn.spawn(config.commands.open("http://127.0.0.1:9091/transmission/web/")) end,
         },
         {
             text = "Open Sonarr",
-            icon = config.places.theme .. "/icons/open-in-new.svg",
+            icon = beautiful.icon("open-in-new.svg"),
             icon_color = beautiful.palette.gray,
-            callback = function() awful.spawn.spawn(config.commands.open("http://localhost:8989/")) end,
+            callback = function() awful.spawn.spawn(config.commands.open("http://127.0.0.1:8989/")) end,
         },
         {
             text = "Open Radarr",
-            icon = config.places.theme .. "/icons/open-in-new.svg",
+            icon = beautiful.icon("open-in-new.svg"),
             icon_color = beautiful.palette.gray,
-            callback = function() awful.spawn.spawn(config.commands.open("http://localhost:7878/")) end,
+            callback = function() awful.spawn.spawn(config.commands.open("http://127.0.0.1:7878/")) end,
         },
         mebox.separator,
         {
             text = "Start All",
-            icon = config.places.theme .. "/icons/play.svg",
+            icon = beautiful.icon("play.svg"),
             icon_color = beautiful.palette.green,
             callback = function() torrent_service.start() end,
         },
         {
             text = "Pause All",
-            icon = config.places.theme .. "/icons/pause.svg",
+            icon = beautiful.icon("pause.svg"),
             icon_color = beautiful.palette.blue,
             callback = function() torrent_service.stop() end,
         },
         {
             text = "Alternative Speed Limit",
-            icon = config.places.theme .. "/icons/tortoise.svg",
+            icon = beautiful.icon("tortoise.svg"),
             icon_color = beautiful.palette.gray,
             on_show = function(item) item.checked = not not torrent_service.last_response.data.alternative_speed_enabled end,
             callback = function(item) torrent_service.alternative_speed(not item.checked) end,
@@ -194,7 +194,7 @@ function torrent_widget.new(wibar)
         mebox.separator,
         {
             text = "Refresh",
-            icon = config.places.theme .. "/icons/refresh.svg",
+            icon = beautiful.icon("refresh.svg"),
             icon_color = beautiful.palette.gray,
             callback = function() torrent_service.update() end,
         },

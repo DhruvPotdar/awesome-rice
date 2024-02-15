@@ -1,4 +1,4 @@
-local config = require("config")
+local config = require("rice.config")
 if not config.features.weather_widget then
     return
 end
@@ -7,7 +7,7 @@ local capi = Capi
 local table = table
 local awful = require("awful")
 local wibox = require("wibox")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -18,10 +18,10 @@ local capsule = require("widget.capsule")
 local mebox = require("widget.mebox")
 local gtable = require("gears.table")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local pango = require("utils.pango")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local function set_text(widget, id, index, text, color)
@@ -84,7 +84,7 @@ end
 function weather_widget.new(wibar)
     local self = wibox.widget {
         widget = capsule,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.capsule.default_style.margins.right,
             bottom = beautiful.wibar.paddings.bottom,
@@ -104,7 +104,7 @@ function weather_widget.new(wibar)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/thermometer.svg",
+                image = beautiful.icon("thermometer.svg"),
             },
             {
                 id = "text",
@@ -118,7 +118,7 @@ function weather_widget.new(wibar)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/weather-pouring.svg",
+                image = beautiful.icon("weather-pouring.svg"),
             },
             {
                 id = "text",
@@ -140,7 +140,7 @@ function weather_widget.new(wibar)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/thermometer.svg",
+                image = beautiful.icon("thermometer.svg"),
             },
             {
                 id = "text",
@@ -162,7 +162,7 @@ function weather_widget.new(wibar)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/home-thermometer.svg",
+                image = beautiful.icon("home-thermometer.svg"),
             },
             {
                 id = "text",
@@ -189,7 +189,7 @@ function weather_widget.new(wibar)
         placement = beautiful.wibar.build_placement(self, self._private.wibar),
         {
             text = "Open Dashboard",
-            icon = config.places.theme .. "/icons/open-in-new.svg",
+            icon = beautiful.icon("open-in-new.svg"),
             icon_color = beautiful.palette.gray,
             callback = function()
                 -- TODO: Needs rework
@@ -202,7 +202,7 @@ function weather_widget.new(wibar)
         mebox.separator,
         {
             text = "Refresh",
-            icon = config.places.theme .. "/icons/refresh.svg",
+            icon = beautiful.icon("refresh.svg"),
             icon_color = beautiful.palette.gray,
             callback = function()
                 weather_service.update()

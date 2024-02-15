@@ -3,8 +3,8 @@ local awful = require("awful")
 local beautiful = require("theme.theme")
 local wibox = require("wibox")
 local dpi = Dpi
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local layoutbox_widget = require("ui.topbar.layoutbox")
@@ -22,6 +22,8 @@ local media_player_widget = require("ui.topbar.media_player")
 
 
 capi.screen.connect_signal("request::desktop_decoration", function(screen)
+    ---@cast screen screen
+
     local is_primary = screen == capi.screen.primary
     local wibar = awful.wibar {
         position = "top",
@@ -53,6 +55,8 @@ capi.screen.connect_signal("request::desktop_decoration", function(screen)
         },
     }
 
+    ---@class screen
+    ---@field topbar table
     screen.topbar = {
         wibox = wibar,
         clientlist = clientlist_widget.new(wibar),
@@ -85,8 +89,6 @@ capi.screen.connect_signal("request::desktop_decoration", function(screen)
         right:add(datetime_widget.new(wibar))
         -- right:add(power_widget.new(wibar))
     else
-        right:add(volume_widget.new(wibar))
-        right:add(datetime_widget.new(wibar))
-        -- right:add(power_widget.new(wibar))
+        right:add(power_widget.new(wibar))
     end
 end)

@@ -1,8 +1,8 @@
 local table = table
 local awful = require("awful")
 local wibox = require("wibox")
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -15,10 +15,11 @@ local capsule = require("widget.capsule")
 local mebox = require("widget.mebox")
 local clock_icon = require("widget.clock_icon")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local htable = require("utils.table")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
+local selection = require("core.selection")
 
 
 local datetime_widget = { mt = {} }
@@ -36,7 +37,7 @@ function datetime_widget:to_clipboard(what)
     end
     local format = table.concat(formats, " ")
     local text = os.date(format)
-    awful.spawn.with_shell(config.commands.copy_text(text))
+    selection.clipboard:copy(text)
 end
 
 function datetime_widget:show_seconds(show)
@@ -69,7 +70,7 @@ local function initialize_date_widget(self, style)
             id = "icon",
             widget = wibox.widget.imagebox,
             resize = true,
-            image = config.places.theme .. "/icons/calendar-month.svg",
+            image = beautiful.icon("calendar-month.svg"),
             stylesheet = css.style { path = { fill = style.fg } },
         },
         {
@@ -105,13 +106,13 @@ local function initialize_date_widget(self, style)
         placement = popup_placement,
         {
             text = "Copy Date",
-            icon = config.places.theme .. "/icons/content-copy.svg",
+            icon = beautiful.icon("content-copy.svg"),
             icon_color = beautiful.palette.gray,
             callback = function() self:to_clipboard("date") end,
         },
         {
             text = "Copy Date &amp; Time",
-            icon = config.places.theme .. "/icons/content-copy.svg",
+            icon = beautiful.icon("content-copy.svg"),
             icon_color = beautiful.palette.gray,
             callback = function() self:to_clipboard() end,
         },
@@ -173,20 +174,20 @@ local function initialize_time_widget(self, style)
         placement = beautiful.wibar.build_placement(time_container, self._private.wibar),
         {
             text = "Copy Time",
-            icon = config.places.theme .. "/icons/content-copy.svg",
+            icon = beautiful.icon("content-copy.svg"),
             icon_color = beautiful.palette.gray,
             callback = function() self:to_clipboard("time") end,
         },
         {
             text = "Copy Date &amp; Time",
-            icon = config.places.theme .. "/icons/content-copy.svg",
+            icon = beautiful.icon("content-copy.svg"),
             icon_color = beautiful.palette.gray,
             callback = function() self:to_clipboard() end,
         },
         mebox.separator,
         {
             text = "Seconds",
-            icon = config.places.theme .. "/icons/clock-fast.svg",
+            icon = beautiful.icon("clock-fast.svg"),
             icon_color = beautiful.palette.gray,
             on_show = function(item) item.checked = not not self._private.seconds end,
             callback = function(item) self:show_seconds(not item.checked) end,
@@ -209,7 +210,7 @@ function datetime_widget.new(wibar)
         {
             id = "#date",
             widget = capsule,
-            margins = hui.thickness {
+            margins = hui.new {
                 top = beautiful.wibar.paddings.top,
                 right = 0,
                 bottom = beautiful.wibar.paddings.bottom,
@@ -222,7 +223,7 @@ function datetime_widget.new(wibar)
         {
             id = "#time",
             widget = capsule,
-            margins = hui.thickness {
+            margins = hui.new {
                 top = beautiful.wibar.paddings.top,
                 right = beautiful.capsule.default_style.margins.right,
                 bottom = beautiful.wibar.paddings.bottom,

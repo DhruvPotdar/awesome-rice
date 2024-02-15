@@ -2,14 +2,14 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtable = require("gears.table")
 local tcolor = require("utils.color")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
 local dpi = Dpi
 local capsule = require("widget.capsule")
-local noice = require("theme.style")
-local config = require("config")
+local noice = require("core.style")
+local config = require("rice.config")
 local redshift_widget = require("ui.topbar.redshift")
 local ui_controller = require("ui.controller")
 

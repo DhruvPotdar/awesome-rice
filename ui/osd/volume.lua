@@ -3,7 +3,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtimer = require("gears.timer")
 local tcolor = require("utils.color")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -13,9 +13,9 @@ local gtable = require("gears.table")
 local capsule = require("widget.capsule")
 local pango = require("utils.pango")
 local css = require("utils.css")
-local config = require("config")
+local config = require("rice.config")
 local htable = require("utils.table")
-local noice = require("theme.style")
+local noice = require("core.style")
 
 
 ---@class VolumeOsd.module
@@ -152,7 +152,7 @@ function M.new()
                         id = "#icon",
                         widget = wibox.widget.imagebox,
                         resize = true,
-                        image = config.places.theme .. "/icons/volume.svg",
+                        image = beautiful.icon("volume.svg"),
                     },
                     {
                         id = "#text",

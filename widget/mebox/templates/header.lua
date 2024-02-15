@@ -2,12 +2,12 @@ local beautiful = require("theme.theme")
 local wibox = require("wibox")
 local pango = require("utils.pango")
 local dpi = Dpi
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 return {
     widget = wibox.container.margin,
-    margins = hui.thickness { dpi(6), dpi(8) },
+    margins = hui.new { dpi(6), dpi(8) },
     {
         id = "#text",
         widget = wibox.widget.textbox,

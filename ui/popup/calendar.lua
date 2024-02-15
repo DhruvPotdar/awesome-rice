@@ -3,14 +3,14 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtable = require("gears.table")
 local tcolor = require("utils.color")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
 local dpi = Dpi
 local capsule = require("widget.capsule")
-local noice = require("theme.style")
-local config = require("config")
+local noice = require("core.style")
+local config = require("rice.config")
 local css = require("utils.css")
 local ui_controller = require("ui.controller")
 
@@ -161,7 +161,7 @@ function M.new(args)
                                 forced_width = dpi(18),
                                 forced_height = dpi(18),
                                 resize = true,
-                                image = config.places.theme .. "/icons/chevron-left.svg",
+                                image = beautiful.icon("chevron-left.svg"),
                                 stylesheet = css.style { path = { fill = beautiful.capsule.default_style.fg } },
                             },
                         },
@@ -180,7 +180,7 @@ function M.new(args)
                                 forced_width = dpi(18),
                                 forced_height = dpi(18),
                                 resize = true,
-                                image = config.places.theme .. "/icons/chevron-right.svg",
+                                image = beautiful.icon("chevron-right.svg"),
                                 stylesheet = css.style { path = { fill = beautiful.capsule.default_style.fg } },
                             },
                         },

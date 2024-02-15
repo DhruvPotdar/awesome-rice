@@ -6,21 +6,23 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
 local focus_history = awful.client.focus.history
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local tcolor = require("utils.color")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 local mebox = require("widget.mebox")
 local capsule = require("widget.capsule")
 local pango = require("utils.pango")
 
 
+local mod_key = mod.alt
+
 return mebox {
     item_width = dpi(1000),
     bg = tcolor.change(beautiful.common.bg, { alpha = 0.85 }),
     placement = awful.placement.centered,
-    paddings = hui.thickness { dpi(16) },
+    paddings = hui.new { dpi(16) },
     items_source = function()
         local items = {}
 
@@ -37,10 +39,7 @@ return mebox {
                     " ",
                     pango.span { fgalpha = "65%", weight = "light", size = "small", pango.escape(client.name or "") },
                 },
-                on_hide = function(item)
-                    if not item.selected then
-                        return
-                    end
+                callback = function()
                     if not client.valid then
                         return
                     end
@@ -51,6 +50,14 @@ return mebox {
                         awful.tag.viewmore(client:tags(), client.screen)
                     end
                     client:emit_signal("request::activate", "switcher", { raise = true })
+                end,
+                buttons_builder = function(item, menu, click_action)
+                    return binding.awful_buttons {
+                        binding.awful({ mod_key }, btn.left, function()
+                            menu.clicked = true
+                            click_action()
+                        end),
+                    }
                 end,
             }
         end
@@ -82,7 +89,6 @@ return mebox {
     end,
     item_template = {
         widget = capsule,
-        enable_overlay = false,
         {
             layout = wibox.layout.fixed.horizontal,
             spacing = dpi(12),
@@ -129,10 +135,23 @@ return mebox {
             end
         end,
     },
-    mouse_move_select = true,
+    on_show = function(self)
+        self.clicked = false
+    end,
+    on_hide = function(self)
+        if not self.clicked then
+            self:execute()
+        end
+    end,
+    buttons_builder = function(self)
+        return binding.awful_buttons {
+            binding.awful({ mod_key }, binding.group.mouse_wheel, function(trigger)
+                self:select_next(-trigger.y)
+            end),
+        }
+    end,
     keygrabber_auto = false,
     keygrabber_builder = function(self)
-        local mod_key = mod.alt
         local tab_key = binding.awful({ mod_key }, "Tab", function()
             self:select_next(1)
         end)
@@ -156,6 +175,9 @@ return mebox {
                     { trigger = "End", direction = "end" },
                 }, function(trigger)
                     self:select_next(trigger.direction)
+                end),
+                binding.awful({}, "Escape", function()
+                    self:hide()
                 end),
             },
             stop_key = mod_key,

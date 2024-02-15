@@ -5,7 +5,7 @@ local ipairs = ipairs
 local select = select
 local tostring = tostring
 local dpi = Dpi
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 local math = math
 local table = table
 local string = string
@@ -14,12 +14,12 @@ local beautiful = require("theme.theme")
 local gtable = require("gears.table")
 local gmatcher = require("gears.matcher")
 local wibox = require("wibox")
-local pbinding = require("io.binding")
+local pbinding = require("core.binding")
 local mod = pbinding.modifier
 local btn = pbinding.button
 local utree = require("utils.tree")
 local capsule = require("widget.capsule")
-local noice = require("theme.style")
+local noice = require("core.style")
 local pango = require("utils.pango")
 local ui_controller = require("ui.controller")
 
@@ -859,7 +859,7 @@ end
 ---@field bg? hex_color
 ---@field fg? hex_color
 ---@field page_break? boolean
----@field groups BindboxGroup[]
+---@field groups? BindboxGroup[]
 
 ---@param group BindboxGroup
 function M.object:add_group(group)
@@ -947,8 +947,8 @@ local function prepare_wibox(self, screen)
     self.screen = screen
 
     local workarea = screen.workarea
-    local workarea_width = workarea.width - beautiful.gap * 4
-    local workarea_height = workarea.height - beautiful.gap * 4
+    local workarea_width = workarea.width - beautiful.edge_gap * 2
+    local workarea_height = workarea.height - beautiful.edge_gap * 2
 
     local page_container = self.widget:get_children_by_id("#page_container")[1]
     page_container.width = self.page_width
@@ -1027,7 +1027,7 @@ end
 
 
 ---@class Bindbox.new.args
----@field include_awesome_bindings? boolean # Default: `true`
+---@field include_awesome_bindings? boolean # Default: `false`
 
 ---@param args? Bindbox.new.args
 ---@return Bindbox
@@ -1106,7 +1106,7 @@ function M.new(args)
 
     self._private.matcher = gmatcher()
     self._private.source_binding_tree = utree.new()
-    self._private.include_awesome_bindings = args.include_awesome_bindings ~= false
+    self._private.include_awesome_bindings = not not args.include_awesome_bindings
 
     self:initialize_style(beautiful.bindbox.default_style, self.widget)
 
@@ -1130,5 +1130,9 @@ function M.new(args)
 
     return self
 end
+
+M.main = M.new {
+    include_awesome_bindings = true,
+}
 
 return setmetatable(M, M.mt)

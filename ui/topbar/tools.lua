@@ -3,8 +3,8 @@ local setmetatable = setmetatable
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local dpi = Dpi
@@ -13,7 +13,7 @@ local gtable = require("gears.table")
 local mebox = require("widget.mebox")
 local tools_popup = require("ui.popup.tools")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local power_widget = { mt = {} }
@@ -36,7 +36,7 @@ function power_widget.new(wibar)
             top = beautiful.wibar.paddings.top,
             bottom = beautiful.wibar.paddings.bottom,
         },
-        paddings = hui.thickness {
+        paddings = hui.new {
             beautiful.capsule.default_style.paddings.top,
             dpi(10),
             beautiful.capsule.default_style.paddings.bottom,
@@ -46,7 +46,7 @@ function power_widget.new(wibar)
             {
                 id = "#icon",
                 widget = wibox.widget.imagebox,
-                image = config.places.theme .. "/icons/toolbox.svg",
+                image = beautiful.icon("toolbox.svg"),
             },
         },
     }

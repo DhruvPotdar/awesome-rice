@@ -3,16 +3,16 @@ local wibox = require("wibox")
 local capsule = require("widget.capsule")
 local css = require("utils.css")
 local pango = require("utils.pango")
-local config = require("config")
+local config = require("rice.config")
 local dpi = Dpi
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 return {
     id = "#container",
     widget = capsule,
-    margins = hui.thickness { dpi(2), 0 },
-    paddings = hui.thickness { dpi(6), dpi(8) },
+    margins = hui.new { dpi(2), 0 },
+    paddings = hui.new { dpi(6), dpi(8) },
     {
         layout = wibox.layout.align.horizontal,
         expand = "inside",
@@ -95,7 +95,7 @@ return {
                 icon = checkbox_style.icon
                 color = checkbox_style.color
             elseif item.submenu then
-                icon = item.submenu_icon or config.places.theme .. "/icons/chevron-right.svg"
+                icon = item.submenu_icon or beautiful.icon("chevron-right.svg")
                 color = style.fg
             end
 

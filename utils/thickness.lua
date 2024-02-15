@@ -6,7 +6,11 @@ local type = type
 local format = string.format
 
 
+---@class Thickness
+---@field zero thickness
 local M = {}
+
+---@alias thickness_value number|number[]|thickness
 
 ---@class thickness : { top: number, right: number, bottom: number, left: number }
 ---@operator add(thickness_value): thickness
@@ -45,7 +49,7 @@ local thickness_mt = {
 }
 
 thickness_mt.__add = function(self, other)
-    other = M.thickness(other)
+    other = M.new(other)
     return setmetatable({
         top = self.top + other.top,
         right = self.right + other.right,
@@ -54,7 +58,7 @@ thickness_mt.__add = function(self, other)
     }, thickness_mt)
 end
 thickness_mt.__sub = function(self, other)
-    other = M.thickness(other)
+    other = M.new(other)
     return setmetatable({
         top = self.top - other.top,
         right = self.right - other.right,
@@ -63,7 +67,7 @@ thickness_mt.__sub = function(self, other)
     }, thickness_mt)
 end
 thickness_mt.__mul = function(self, other)
-    other = M.thickness(other)
+    other = M.new(other)
     return setmetatable({
         top = self.top * other.top,
         right = self.right * other.right,
@@ -72,7 +76,7 @@ thickness_mt.__mul = function(self, other)
     }, thickness_mt)
 end
 thickness_mt.__div = function(self, other)
-    other = M.thickness(other)
+    other = M.new(other)
     return setmetatable({
         top = self.top / other.top,
         right = self.right / other.right,
@@ -81,7 +85,7 @@ thickness_mt.__div = function(self, other)
     }, thickness_mt)
 end
 thickness_mt.__idiv = function(self, other)
-    other = M.thickness(other)
+    other = M.new(other)
     return setmetatable({
         top = self.top // other.top,
         right = self.right // other.right,
@@ -98,13 +102,11 @@ thickness_mt.__unm = function(self)
     }, thickness_mt)
 end
 
----@alias thickness_value number|number[]|thickness
-
 ---@param value? thickness_value
 ---@return thickness # Returns the same table instance (i.e. the `value` parameter).
-function M.thickness(value)
+function M.new(value)
     if not value then
-        return M.zero_thickness
+        return M.zero
     end
 
     if type(value) == "table" then
@@ -156,26 +158,6 @@ function M.thickness(value)
     end
 end
 
-M.zero_thickness = M.thickness(0)
-
----@param geometry geometry
----@param thickness? thickness_value
----@return geometry
-function M.inflate(geometry, thickness)
-    thickness = M.thickness(thickness)
-    return thickness and {
-        x = geometry.x - thickness.left,
-        y = geometry.y - thickness.top,
-        width = geometry.width + thickness.left + thickness.right,
-        height = geometry.height + thickness.top + thickness.bottom,
-    } or geometry
-end
-
----@param geometry geometry
----@param thickness? thickness_value
----@return geometry
-function M.shrink(geometry, thickness)
-    return M.inflate(geometry, -M.thickness(thickness))
-end
+M.zero = M.new(0)
 
 return M

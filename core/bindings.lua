@@ -920,3 +920,4 @@ awful.keygrabber {
 return {
     main_bindbox = main_bindbox,
 }
+

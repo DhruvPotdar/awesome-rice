@@ -4,7 +4,7 @@ local beautiful = require("theme.theme")
 local dpi = Dpi
 local mebox = require("widget.mebox")
 local gtable = require("gears.table")
-local config = require("config")
+local config = require("rice.config")
 local common = require("ui.menu.templates.client._common")
 
 
@@ -26,7 +26,7 @@ function M.new()
             for screen in capi.screen do
                 items[#items + 1] = {
                     text = screen.index,
-                    icon = config.places.theme .. "/icons/monitor.svg",
+                    icon = beautiful.icon("monitor.svg"),
                     icon_color = beautiful.palette.white,
                     checkbox_type = "radiobox",
                     on_show = function(item, menu, args, context)

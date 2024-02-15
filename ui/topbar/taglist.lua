@@ -7,22 +7,23 @@ local base = require("wibox.widget.base")
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
 local tcolor = require("utils.color")
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local dpi = Dpi
 local capsule = require("widget.capsule")
 local gtable = require("gears.table")
-local core_tags = require("core.tags")
+local gcolor = require("gears.color")
+local core_tag = require("core.tag")
 local mebox = require("widget.mebox")
 local tag_menu_template = require("ui.menu.templates.tag.main")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
-local screen_helper = require("utils.screen")
+local widget_helper = require("core.widget")
+local screen_helper = require("core.screen")
 local pango = require("utils.pango")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local taglist = { mt = {} }
@@ -105,7 +106,7 @@ function taglist.new(wibar)
 
                 local plus_button = layout.widget.children[2]
                 local plus_button_icon = layout:get_children_by_id("#icon")[1]
-                plus_button_icon:set_stylesheet(css.style { path = { fill = plus_button.fg } })
+                plus_button_icon:set_stylesheet(css.style { path = { fill = gcolor.ensure_pango_color(plus_button.fg) } })
             end
 
             root_container:reset()
@@ -192,27 +193,33 @@ function taglist.new(wibar)
                 },
                 {
                     widget = capsule,
-                    margins = hui.thickness {
+                    margins = hui.new {
                         beautiful.wibar.paddings.top,
                         beautiful.wibar.spacing / 2,
                         beautiful.wibar.paddings.bottom,
                     },
-                    paddings = hui.thickness { dpi(6) },
+                    paddings = hui.new { dpi(6) },
                     bg = tcolor.transparent,
                     fg = beautiful.capsule.styles.disabled.fg,
                     border_width = 0,
                     buttons = binding.awful_buttons {
                         binding.awful({}, btn.left, function()
-                            core_tags.add_volatile_tag(wibar.screen):view_only()
+                            awful.tag.add(nil, core_tag.build {
+                                wibar.screen,
+                                volatile = true,
+                            }):view_only()
                         end),
                         binding.awful({}, btn.middle, function()
-                            core_tags.add_volatile_tag(wibar.screen)
+                            awful.tag.add(nil, core_tag.build {
+                                wibar.screen,
+                                volatile = true,
+                            })
                         end),
                     },
                     {
                         id = "#icon",
                         widget = wibox.widget.imagebox,
-                        image = config.places.theme .. "/icons/plus.svg",
+                        image = beautiful.icon("plus.svg"),
                         resize = true,
                     },
                 },
@@ -221,7 +228,7 @@ function taglist.new(wibar)
         widget_template = {
             id = "#container",
             widget = capsule,
-            margins = hui.thickness {
+            margins = hui.new {
                 beautiful.wibar.paddings.top,
                 beautiful.wibar.spacing / 2,
                 beautiful.wibar.paddings.bottom,

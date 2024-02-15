@@ -2,8 +2,8 @@ local capi = Capi
 local math = math
 local awful = require("awful")
 local wibox = require("wibox")
-local config = require("config")
-local binding = require("io.binding")
+local config = require("rice.config")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -13,12 +13,12 @@ local gshape = require("gears.shape")
 local gtable = require("gears.table")
 local capsule = require("widget.capsule")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local mebox = require("widget.mebox")
-local mouse_helper = require("utils.mouse")
+local mouse_helper = require("core.mouse")
 local pango = require("utils.pango")
 local css = require("utils.css")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local volume_widget = { mt = {} }
@@ -102,7 +102,7 @@ end
 function volume_widget.new(wibar)
     local self = wibox.widget {
         widget = capsule,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.capsule.default_style.margins.right,
             bottom = beautiful.wibar.paddings.bottom,
@@ -115,7 +115,7 @@ function volume_widget.new(wibar)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/volume.svg",
+                image = beautiful.icon("volume.svg"),
             },
             {
                 id = "text",
@@ -149,13 +149,13 @@ function volume_widget.new(wibar)
         placement = beautiful.wibar.build_placement(self, self._private.wibar),
         {
             text = "Open Mixer",
-            icon = config.places.theme .. "/icons/tune.svg",
+            icon = beautiful.icon("tune.svg"),
             icon_color = beautiful.palette.orange,
             callback = function() self:show_tools(config.apps.mixer) end,
         },
         {
             text = "Open Bluetooth",
-            icon = config.places.theme .. "/icons/bluetooth-settings.svg",
+            icon = beautiful.icon("bluetooth-settings.svg"),
             icon_color = beautiful.palette.blue,
             callback = function() self:show_tools(config.apps.bluetooth_control) end,
         },

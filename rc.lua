@@ -1,12 +1,10 @@
 require("develop")
-
 require("globals")
 
-require("config")
-
-require("theme.manager").initialize()
-
 require("core")
+
+require("theme")
+require("rice")
 require("services")
 require("ui")
 local beautiful = require("beautiful")

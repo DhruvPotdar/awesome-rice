@@ -1,6 +1,6 @@
 -- DEPENDENCIES (feature flag "redshift_widget"): sct
 
-local config = require("config")
+local config = require("rice.config")
 if not config.features.redshift_widget then
     return
 end
@@ -10,7 +10,7 @@ local math = math
 local string = string
 local awful = require("awful")
 local wibox = require("wibox")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
@@ -18,10 +18,10 @@ local dpi = Dpi
 local capsule = require("widget.capsule")
 local gshape = require("gears.shape")
 local gtable = require("gears.table")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local tcolor = require("utils.color")
-local hui = require("utils.ui")
-local mouse_helper = require("utils.mouse")
+local hui = require("utils.thickness")
+local mouse_helper = require("core.mouse")
 local pango = require("utils.pango")
 local css = require("utils.css")
 local umath = require("utils.math")
@@ -77,7 +77,7 @@ function redshift_widget.new(wibar, on_dashboard)
     local self = wibox.widget {
         widget = capsule,
         margins = not on_dashboard
-            and hui.thickness {
+            and hui.new {
                 top = beautiful.wibar.paddings.top,
                 right = beautiful.capsule.default_style.margins.right,
                 bottom = beautiful.wibar.paddings.bottom,
@@ -91,7 +91,7 @@ function redshift_widget.new(wibar, on_dashboard)
                 id = "icon",
                 widget = wibox.widget.imagebox,
                 resize = true,
-                image = config.places.theme .. "/icons/lightbulb-on.svg",
+                image = beautiful.icon("lightbulb-on.svg"),
                 stylesheet = css.style { path = { fill = style.fg } },
             },
             {

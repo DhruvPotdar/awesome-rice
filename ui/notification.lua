@@ -9,18 +9,16 @@ local ruled = require("ruled")
 local beautiful = require("theme.theme")
 local capsule = require("widget.capsule")
 local gtimer = require("gears.timer")
+local binding = require("core.binding")
+local mod = binding.modifier
+local btn = binding.button
+local config = require("rice.config")
+local gcolor = require("gears.color")
 local ucolor = require("utils.color")
+local css = require("utils.css")
 
 local get_time = socket and socket.gettime
 
-
-naughty.connect_signal("request::display_error", function(message, startup)
-    naughty.notification {
-        urgency = "critical",
-        title = "Oops, an error happened" .. (startup and " during startup!" or "!"),
-        message = message,
-    }
-end)
 
 naughty.connect_signal("request::display", function(n)
     local box = naughty.layout.box {
@@ -56,8 +54,30 @@ naughty.connect_signal("request::display", function(n)
                             {
                                 widget = wibox.widget.textbox,
                                 opacity = 0.5,
-                                text = "at " .. os_date("%H:%M"):gsub("^0", ""),
+                                text = os_date("%H:%M"):gsub("^0", ""),
                                 valign = "top",
+                            },
+                        },
+                        {
+                            widget = wibox.container.margin,
+                            margins = n.style.close_button_margins,
+                            {
+                                layout = wibox.layout.fixed.vertical,
+                                {
+                                    widget = wibox.container.constraint,
+                                    strategy = "max",
+                                    width = n.style.close_button_size,
+                                    height = n.style.close_button_size,
+                                    {
+                                        id = "#close",
+                                        widget = capsule,
+                                        {
+                                            widget = wibox.widget.imagebox,
+                                            image = beautiful.icon("close.svg"),
+                                            resize = true,
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
@@ -113,6 +133,24 @@ naughty.connect_signal("request::display", function(n)
                 },
             },
         },
+    }
+
+    -- Reset default buttons
+    box.buttons = {}
+
+    local close_button = box.widget:get_children_by_id("#close")[1] --[[@as Capsule]]
+    close_button.fg = ucolor.transparent
+    close_button:connect_signal("property::fg", function(button, fg)
+        button.widget:set_stylesheet(css.style { path = { fill = gcolor.ensure_pango_color(fg) } })
+    end)
+    close_button:apply_style(n.style.close_button)
+    close_button.buttons = binding.awful_buttons {
+        binding.awful({}, btn.left, nil, function()
+            local notification = box._private.notification[1]
+            if notification then
+                notification:destroy()
+            end
+        end),
     }
 
     if get_time then
@@ -181,6 +219,12 @@ ruled.notification.connect_signal("request::rules", function()
         properties = {
             never_timeout = true,
             style = beautiful.notification.styles.critical,
+        },
+    }
+    ruled.notification.append_rule {
+        rule = { category = "awesome.power.timer" },
+        properties = {
+            never_timeout = false,
         },
     }
 end)

@@ -5,10 +5,10 @@ local math = math
 local wibox = require("wibox")
 local mebox = require("widget.mebox")
 local gtable = require("gears.table")
-local config = require("config")
+local config = require("rice.config")
 local common = require("ui.menu.templates.client._common")
 local capsule = require("widget.capsule")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 local css = require("utils.css")
 
 
@@ -17,8 +17,8 @@ local M = {}
 local checkbox_item_template = {
     id = "#container",
     widget = capsule,
-    margins = hui.thickness { dpi(2), 0 },
-    paddings = hui.thickness { dpi(6), 0 },
+    margins = hui.new { dpi(2), 0 },
+    paddings = hui.new { dpi(6), 0 },
     {
         layout = wibox.container.place,
         halign = "center",
@@ -91,7 +91,7 @@ function M.new()
             ---@type MeboxItem.args[]
             local items = {
                 function()
-                    local item = common.build_simple_toggle("Sticky", "sticky", nil, "/icons/pin.svg", beautiful.palette.white)
+                    local item = common.build_simple_toggle("Sticky", "sticky", nil, beautiful.icon("pin.svg"), beautiful.palette.white)
                     item.layout_id = "#sticky"
                     return item
                 end,
@@ -110,7 +110,7 @@ function M.new()
                             return math.max(new_width, old_width)
                         end,
                         text = tag.name,
-                        icon = config.places.theme .. "/icons/tag.svg",
+                        icon = beautiful.icon("tag.svg"),
                         icon_color = beautiful.palette.white,
                         callback = function()
                             client:move_to_tag(tag)

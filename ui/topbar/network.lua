@@ -2,10 +2,10 @@ local capi = Capi
 local setmetatable = setmetatable
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
-local config = require("config")
+local config = require("rice.config")
 local network_service = require("services.network")
 local dpi = Dpi
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local humanizer = require("utils.humanizer")
@@ -16,9 +16,10 @@ local pango = require("utils.pango")
 local css = require("utils.css")
 local tcolor = require("utils.color")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local htable = require("utils.table")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
+local ucolor = require("utils.color")
 
 
 local network_widget = { mt = {} }
@@ -66,7 +67,7 @@ local function refresh_info(container_widget, style, text, icon)
     local icon_widget = container_widget:get_children_by_id("icon")[1]
     icon = style.icon or icon
     if icon then
-        icon_widget:set_image(config.places.theme .. "/icons/" .. icon .. ".svg")
+        icon_widget:set_image(beautiful.icon(icon .. ".svg"))
     end
     icon_widget:set_stylesheet(css.style { path = { fill = style.fg } })
 end
@@ -141,7 +142,7 @@ function network_widget.new(wibar)
     local self = wibox.widget {
         widget = capsule,
         enable_overlay = false,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.capsule.default_style.margins.right,
             bottom = beautiful.wibar.paddings.bottom,
@@ -164,7 +165,7 @@ function network_widget.new(wibar)
                         beautiful.palette.red_bright,
                     },
                     nan_indication = true,
-                    nan_color = beautiful.palette.red,
+                    nan_color = ucolor.transparent,
                     step_width = 2,
                     step_spacing = 0,
                     min_value = -max_upload_speed,
@@ -193,7 +194,7 @@ function network_widget.new(wibar)
                     id = "icon",
                     widget = wibox.widget.imagebox,
                     resize = true,
-                    image = config.places.theme .. "/icons/download.svg",
+                    image = beautiful.icon("download.svg"),
                 },
                 {
                     id = "text",
@@ -207,7 +208,7 @@ function network_widget.new(wibar)
                     id = "icon",
                     widget = wibox.widget.imagebox,
                     resize = true,
-                    image = config.places.theme .. "/icons/upload.svg",
+                    image = beautiful.icon("upload.svg"),
                 },
                 {
                     id = "text",
@@ -237,7 +238,7 @@ function network_widget.new(wibar)
         placement = beautiful.wibar.build_placement(self, self._private.wibar),
         {
             text = "Graph",
-            icon = config.places.theme .. "/icons/chart-line.svg",
+            icon = beautiful.icon("chart-line.svg"),
             icon_color = beautiful.palette.gray,
             on_show = function(item) item.checked = not not self._private.show_graph end,
             callback = function(item) self:show_graph(not item.checked) end,

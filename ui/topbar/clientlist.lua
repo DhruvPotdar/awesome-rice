@@ -2,7 +2,7 @@ local ipairs = ipairs
 local awful = require("awful")
 local capsule = require("widget.capsule")
 local wibox = require("wibox")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local dpi = Dpi
@@ -13,10 +13,10 @@ local gtable = require("gears.table")
 local mebox = require("widget.mebox")
 local client_menu_template = require("ui.menu.templates.client.main")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local pango = require("utils.pango")
 local desktop = require("services.desktop")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local clientlist = { mt = {} }
@@ -171,7 +171,7 @@ function clientlist.new(wibar)
             {
                 id = "#container",
                 widget = capsule,
-                margins = hui.thickness {
+                margins = hui.new {
                     beautiful.wibar.paddings.top,
                     beautiful.wibar.spacing / 2,
                     beautiful.wibar.paddings.bottom,

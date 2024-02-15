@@ -16,14 +16,15 @@ local directions = {
     down = { x = 0, y = 1 },
 }
 
-
 local M = {
     resize_corner_size = 50,
     resize_max_distance = 20,
     floating_move_step = 50,
-    tiled_resize_factor = 0.02,
+    tiling_resize_factor = 0.02,
 }
 
+---@param client client
+---@return boolean|nil
 function M.is_floating(client)
     if not client then
         return nil
@@ -61,6 +62,9 @@ local resize_quadrants = {
     },
 }
 
+---@param client client
+---@param coords point
+---@return string
 function M.get_resize_corner(client, coords)
     local g = client:geometry()
     g.width = g.width + 2 * client.border_width
@@ -114,6 +118,9 @@ function M.get_resize_corner(client, coords)
     return corner
 end
 
+---@param client client
+---@param coords point
+---@return number
 function M.get_distance(client, coords)
     local x, y
 
@@ -146,6 +153,7 @@ function M.get_distance(client, coords)
     return distance
 end
 
+---@return client?
 function M.find_closest(args)
     args = args or {}
     local clients = args.clients or (capi.mouse.screen and capi.mouse.screen.clients)
@@ -232,7 +240,7 @@ end
 
 ---@param client client
 ---@param direction direction
-local function move_tiled(client, direction)
+local function move_tiling(client, direction)
     if not client or not client.screen then
         return
     end
@@ -259,7 +267,7 @@ end
 ---@param parent_descriptor unknown
 ---@param resize_factor number
 local function resize_descriptor(descriptor, parent_descriptor, resize_factor)
-    resize_factor = resize_factor * M.tiled_resize_factor
+    resize_factor = resize_factor * M.tiling_resize_factor
     if resize_factor == 0 then
         return
     end
@@ -271,7 +279,7 @@ end
 
 ---@param client client
 ---@param direction direction
-local function resize_tiled(client, direction)
+local function resize_tiling(client, direction)
     local screen = client and client.screen and capi.screen[client.screen]
     local tag = screen and screen.selected_tag
     local layout = tag and tag.layout
@@ -311,7 +319,7 @@ function M.move(client, direction)
     if M.is_floating(client) then
         move_floating(client, direction)
     else
-        move_tiled(client, direction)
+        move_tiling(client, direction)
     end
 
     local new_screen = client.screen
@@ -327,11 +335,11 @@ function M.resize(client, direction)
     if M.is_floating(client) then
         resize_floating(client, direction)
     else
-        resize_tiled(client, direction)
+        resize_tiling(client, direction)
     end
 end
 
----@param client client
+---@param client? client
 ---@param direction direction
 function M.focus(client, direction)
     local old_client = client or capi.client.focus
@@ -370,13 +378,11 @@ function M.mouse_move(client)
     })
 end
 
----@param client client
+---@param client? client
 function M.mouse_resize(client)
-    if client == true then
-        client = M.find_closest {
-            max_distance = M.resize_max_distance,
-        }
-    end
+    client = client or M.find_closest {
+        max_distance = M.resize_max_distance,
+    }
 
     if not client
         or client.fullscreen
@@ -406,6 +412,73 @@ function M.mouse_resize(client)
         include_sides = true,
         axis = axis,
     })
+end
+
+---@type table<client, screen>
+local fullscreen_restore_screens = setmetatable({}, { __mode = "kv" })
+
+---@param client client
+---@param on_primary_screen? boolean
+function M.fullscreen(client, on_primary_screen)
+    local client_screen = client.screen
+    if on_primary_screen then
+        local primary_screen = capi.screen["primary"]
+        if not client.fullscreen or client_screen ~= primary_screen then
+            fullscreen_restore_screens[client] = client_screen
+            client:move_to_screen(primary_screen)
+            client.fullscreen = true
+        else
+            local restore_screen = fullscreen_restore_screens[client]
+            if restore_screen and restore_screen ~= client_screen then
+                client:move_to_screen(restore_screen)
+                fullscreen_restore_screens[client] = nil
+            end
+            client.fullscreen = false
+        end
+    else
+        if not client.fullscreen then
+            fullscreen_restore_screens[client] = nil
+            client.fullscreen = true
+        else
+            local restore_screen = fullscreen_restore_screens[client]
+            if restore_screen and restore_screen ~= client_screen then
+                client:move_to_screen(restore_screen)
+                fullscreen_restore_screens[client] = nil
+            end
+            client.fullscreen = false
+        end
+    end
+    client:raise()
+end
+
+do
+    local empty_tag = {}
+    local floating_layout = require("awful.layout.suit.floating")
+
+    local function is_floating(client)
+        return client.floating or (client.first_tag or empty_tag).layout == floating_layout
+    end
+
+    local function try_store(client)
+        if is_floating(client) then
+            client.floating_geometry = client:geometry()
+        end
+    end
+
+    local function try_restore(client)
+        if is_floating(client) then
+            client:geometry(client.floating_geometry)
+        end
+    end
+
+    capi.client.connect_signal("manage", try_store)
+    capi.client.connect_signal("tagged", try_restore)
+    capi.client.connect_signal("property::geometry", try_store)
+    capi.tag.connect_signal("property::layout", function(tag)
+        for _, client in ipairs(tag:clients()) do
+            try_restore(client)
+        end
+    end)
 end
 
 return M

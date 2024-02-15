@@ -2,7 +2,7 @@ local capi = Capi
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("theme.theme")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local dpi = Dpi
@@ -10,11 +10,11 @@ local capsule = require("widget.capsule")
 local alayout = require("awful.layout")
 local gtable = require("gears.table")
 local aplacement = require("awful.placement")
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local mebox = require("widget.mebox")
 local tag_layout_menu_template = require("ui.menu.templates.tag.layout")
 local main_menu = require("ui.menu.main")
-local hui = require("utils.ui")
+local hui = require("utils.thickness")
 
 
 local layoutbox = { mt = {} }
@@ -26,22 +26,23 @@ function layoutbox:update_from_tag(tag)
 end
 
 function layoutbox:update()
-    local name = alayout.getname(alayout.get(self._private.wibar.screen))
-    local icon = beautiful.layout_icons[name]
-    self.widget.text.text = icon and "" or name
-    self.widget.icon.image = icon
+    local layout = alayout.get(self._private.wibar.screen)
+    local name = alayout.getname(layout)
+    local style = beautiful.layouts[name] or {}
+    self.widget.text.text = style.icon and "" or name
+    self.widget.icon.image = style.icon
 end
 
 function layoutbox.new(wibar)
     local self = wibox.widget {
         widget = capsule,
-        margins = hui.thickness {
+        margins = hui.new {
             top = beautiful.wibar.paddings.top,
             right = beautiful.capsule.default_style.margins.right,
             bottom = beautiful.wibar.paddings.bottom,
             left = beautiful.wibar.paddings.left,
         },
-        paddings = hui.thickness {
+        paddings = hui.new {
             beautiful.capsule.default_style.paddings.top,
             dpi(10),
             beautiful.capsule.default_style.paddings.bottom,

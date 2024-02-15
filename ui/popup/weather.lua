@@ -3,13 +3,13 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gtable = require("gears.table")
 local tcolor = require("utils.color")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
 local beautiful = require("theme.theme")
 local weather_service = require("services.weather")
-local widget_helper = require("utils.widget")
-local hui = require("utils.ui")
+local widget_helper = require("core.widget")
+local hui = require("utils.thickness")
 local dpi = Dpi
 local humanizer = require("utils.humanizer")
 local umath = require("utils.math")
@@ -383,7 +383,7 @@ local function new(parent, data_widget_factory, args)
         padding = args.padding or dpi(24),
     }, { __index = WeatherPopup })
 
-    self.margins = args.margins or hui.thickness {
+    self.margins = args.margins or hui.new {
         beautiful.gap,
         top = beautiful.gap - (self.arrow_size / 2) - self.border_width,
     }

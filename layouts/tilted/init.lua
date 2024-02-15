@@ -5,7 +5,7 @@ local find = string.find
 local aclient = require("awful.client")
 local amouse = require("awful.mouse")
 local alayout = require("awful.layout")
-local uui = require("utils.ui")
+local ugeometry = require("utils.geometry")
 
 
 local tilted = {
@@ -124,10 +124,10 @@ function tilted.object:resize(screen, tag, client, corner)
     end
 
     local full_workarea = parameters.workarea
-    local workarea = uui.shrink(full_workarea, layout_descriptor.allow_padding and layout_descriptor.padding[self] or nil)
+    local workarea = ugeometry.shrink(full_workarea, layout_descriptor.allow_padding and layout_descriptor.padding[self] or nil)
     local useless_gap = parameters.useless_gap
 
-    local initial_geometry = uui.inflate(client:geometry(), client.border_width + useless_gap)
+    local initial_geometry = ugeometry.inflate(client:geometry(), client.border_width + useless_gap)
     initial_geometry = {
         x = initial_geometry.x,
         y = initial_geometry.y,
@@ -422,7 +422,7 @@ function tilted.object:arrange(parameters)
         }
     end
 
-    local workarea = uui.shrink(full_workarea, layout_descriptor.allow_padding and layout_descriptor.padding[self] or nil)
+    local workarea = ugeometry.shrink(full_workarea, layout_descriptor.allow_padding and layout_descriptor.padding[self] or nil)
     local useless_gap = parameters.useless_gap
 
     local width = workarea[oi.width]
@@ -554,22 +554,26 @@ function tilted.object.skip_gap(tiled_client_count, tag)
     return tiled_client_count == 1 and tag.master_fill_policy == "expand"
 end
 
-function tilted.new(name, args)
-    args = args or {}
+---@class Tilted.new.args
+---@field name string # Unique layout name.
+---@field is_horizontal? boolean # Default: `true`
+---@field is_reversed? boolean # Default: `false`
+---@field column_strategy? Tilted.ColumnStrategy # Default: `linear`
 
-    local column_strategy = args.column_strategy
-    if type(column_strategy) == "string" then
-        column_strategy = tilted.column_strategy[column_strategy]
+---@param args? string|Tilted.new.args
+---@return awful.layout
+function tilted.new(args)
+    if type(args) == "string" then
+        args = { name = args }
     end
-    if not column_strategy then
-        column_strategy = tilted.column_strategy.linear
-    end
+    args = args or {}
+    args.name = args.name or "tilted"
 
     local self = {
-        name = name,
-        is_horizontal = args.is_horizontal or args.is_horizontal == nil,
-        is_reversed = args.is_reversed,
-        column_strategy = column_strategy,
+        name = args.name,
+        is_horizontal = args.is_horizontal ~= false,
+        is_reversed = not not args.is_reversed,
+        column_strategy = args.column_strategy or tilted.column_strategy.linear,
     }
 
     local oi = {}
@@ -589,16 +593,6 @@ function tilted.new(name, args)
 
     return setmetatable(self, { __index = tilted.object })
 end
-
-tilted.right = tilted.new("tilted_right")
-
-tilted.left = tilted.new("tilted_left", { is_reversed = true })
-
-tilted.bottom = tilted.new("tilted_bottom", { is_horizontal = false })
-
-tilted.top = tilted.new("tilted_top", { is_horizontal = false, is_reversed = true })
-
-tilted.center = tilted.new("tilted_center", { column_strategy = "center" })
 
 amouse.resize.add_enter_callback(function(client, args)
     if client.floating then

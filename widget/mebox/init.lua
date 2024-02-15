@@ -8,14 +8,15 @@ local awful = require("awful")
 local beautiful = require("theme.theme")
 local gtable = require("gears.table")
 local grectangle = require("gears.geometry").rectangle
+local gtimer = require("gears.timer")
 local wibox = require("wibox")
 local base = require("wibox.widget.base")
-local binding = require("io.binding")
+local binding = require("core.binding")
 local mod = binding.modifier
 local btn = binding.button
-local widget_helper = require("utils.widget")
+local widget_helper = require("core.widget")
 local gmath = require("gears.math")
-local noice = require("theme.style")
+local noice = require("core.style")
 local templates = require("widget.mebox.templates")
 local ui_controller = require("ui.controller")
 
@@ -86,6 +87,9 @@ M.object = {}
 ---@class Mebox.private
 ---@field parent? Mebox
 ---@field active_submenu? { index: integer, menu: Mebox }
+---@field submenu_delay? number|boolean
+---@field submenu_delay_timer? gears.timer
+---@field submenu_delay_callback? function
 ---@field submenu_cache? (Mebox|false)[]
 ---@field items? MeboxItem[]
 ---@field item_widgets? (wibox.widget.base|false)[]
@@ -107,6 +111,7 @@ M.object = {}
 ---@field separator_template widget_template
 ---@field header_template widget_template
 ---@field info_template widget_template
+---@field is_hiding boolean
 
 noice.define_style(M.object, {
     bg = { proxy = true },
@@ -450,7 +455,19 @@ function M.object:hide(context)
     if not self.visible then
         return
     end
+
+    if self._private.is_hiding then
+        return
+    end
+    self._private.is_hiding = true
+
     context = context or {}
+
+    if self._private.submenu_delay_timer then
+        self._private.submenu_delay_timer:stop()
+    end
+    self._private.submenu_delay_timer = nil
+    self._private.submenu_delay_callback = nil
 
     hide_active_submenu(self)
 
@@ -471,12 +488,14 @@ function M.object:hide(context)
     if type(self._private.on_hide) == "function" then
         self._private.on_hide(self)
     end
+    self:emit_signal("menu::hide", context)
 
     if self._private.keygrabber_auto and self._private.keygrabber then
         self._private.keygrabber:stop()
     end
 
     self.visible = false
+    self._private.is_hiding = false
 
     self._private.layout = nil
     self._private.layout_container:set_widget(nil)
@@ -542,10 +561,27 @@ local function add_items(self, args, context)
                     show_submenu = self._private.mouse_move_show_submenu
                 end
                 if show_submenu then
-                    self:show_submenu(index, setmetatable({ source = "mouse" }, context))
+                    context = setmetatable({ source = "mouse" }, context)
+                    local p = self:get_root_menu()._private
+                    if p.submenu_delay_timer then
+                        p.submenu_delay_callback = function()
+                            self:show_submenu(index, context)
+                        end
+                        p.submenu_delay_timer:again()
+                    else
+                        self:show_submenu(index, context)
+                    end
                 else
                     hide_active_submenu(self)
                 end
+            end)
+
+            item_widget:connect_signal("mouse::leave", function()
+                local p = self:get_root_menu()._private
+                if p.submenu_delay_timer then
+                    p.submenu_delay_timer:stop()
+                end
+                p.submenu_delay_callback = nil
             end)
 
             local layout = item.layout_id
@@ -573,7 +609,43 @@ end
 ---@param context? Mebox.context
 ---@param force? boolean
 function M.object:show(args, context, force)
-    if not force and (self.visible or not ui_controller.enter(self:get_root_menu())) then
+    local root_menu = self:get_root_menu()
+
+    if root_menu == self then
+        local p = root_menu._private
+
+        if p.submenu_delay_timer then
+            p.submenu_delay_timer:stop()
+        end
+
+        p.submenu_delay_timer = nil
+        p.submenu_delay_callback = nil
+
+        local delay = p.submenu_delay
+        if delay == true then
+            delay = 0.25
+        end
+
+        if delay then
+            ---@cast delay number
+            p.submenu_delay_timer = gtimer {
+                timeout = delay,
+                autostart = false,
+                call_now = false,
+                callback = function()
+                    if p.submenu_delay_timer then
+                        p.submenu_delay_timer:stop()
+                    end
+                    if root_menu.visible and p.submenu_delay_callback then
+                        p.submenu_delay_callback()
+                    end
+                    p.submenu_delay_callback = nil
+                end,
+            }
+        end
+    end
+
+    if not force and (self.visible or not ui_controller.enter(root_menu)) then
         return
     end
 
@@ -585,6 +657,7 @@ function M.object:show(args, context, force)
             return
         end
     end
+    self:emit_signal("menu::show", args, context)
 
     self._private.layout = base.make_widget_from_value(self._private.layout_template) --[[@as wibox.layout]]
     self._private.layout_container:set_widget(self._private.layout)
@@ -603,6 +676,7 @@ function M.object:show(args, context, force)
             item.on_ready(item_widget, item, self, args, context)
         end
     end
+    self:emit_signal("menu::ready", args, context)
 
     if self._private.keygrabber_auto and self._private.keygrabber then
         self._private.keygrabber:start()
@@ -617,6 +691,7 @@ function M.object:show(args, context, force)
 
     place(self, args)
 
+    self._private.is_hiding = false
     self.visible = true
 end
 
@@ -704,6 +779,9 @@ end
 ---@param seek_origin integer|"begin"|"end"
 ---@overload fun(seek_origin: "begin"|"end")
 function M.object:select_next(direction, seek_origin)
+    if not self._private.items then
+        return
+    end
     local count = #self._private.items
     if count < 1 then
         return
@@ -859,6 +937,7 @@ end
 ---@field orientation? orientation
 ---@field layout_template? widget_value -- TODO: Rename `layout_template` property
 ---@field layout_navigator? fun(menu: Mebox, x: sign, y: sign, direction?: direction, context: Mebox.context)
+---@field submenu_delay? number|boolean
 ---@field cache_submenus? boolean
 ---@field items_source Mebox.items_source
 ---@field on_show? fun(menu: Mebox, args: Mebox.show.args, context: Mebox.context): boolean?
@@ -889,10 +968,12 @@ function M.new(args, is_submenu)
             id = "#layout_container",
             layout = wibox.container.margin,
         },
-    } --[[@as Mebox]]
+    }
+    ---@cast self Mebox
 
     gtable.crush(self, M.object, true)
 
+    self._private.submenu_delay = args.submenu_delay == nil or args.submenu_delay
     self._private.submenu_cache = args.cache_submenus ~= false and {} or nil
     self._private.items_source = args.items_source or args
     self._private.on_show = args.on_show

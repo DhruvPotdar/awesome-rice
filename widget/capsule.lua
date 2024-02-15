@@ -7,9 +7,9 @@ local gcolor = require("gears.color")
 local gshape = require("gears.shape")
 local base = require("wibox.widget.base")
 local cairo = require("lgi").cairo
-local noice = require("theme.style")
-local uui = require("utils.ui")
-local binding = require("io.binding")
+local noice = require("core.style")
+local uui = require("utils.thickness")
+local binding = require("core.binding")
 
 
 ---@class Capsule.module
@@ -58,8 +58,8 @@ noice.define_style(M.object, {
     border_color = { convert = gcolor.create_pattern, emit_redraw_needed = true },
     border_width = { emit_redraw_needed = true },
     shape = { emit_redraw_needed = true },
-    margins = { convert = uui.thickness, emit_layout_changed = true, emit_redraw_needed = true },
-    paddings = { convert = uui.thickness, emit_layout_changed = true, emit_redraw_needed = true },
+    margins = { convert = uui.new, emit_layout_changed = true, emit_redraw_needed = true },
+    paddings = { convert = uui.new, emit_layout_changed = true, emit_redraw_needed = true },
     hover_overlay = { convert = gcolor.create_pattern, emit_redraw_needed = true },
     press_overlay = { convert = gcolor.create_pattern, emit_redraw_needed = true },
 })
@@ -75,8 +75,8 @@ end
 ---@param include_paddings boolean
 ---@param include_border boolean
 local function get_layout_geometry(self, width, height, include_paddings, include_border)
-    local margins = self._style.current.margins or uui.zero_thickness
-    local paddings = include_paddings and self._style.current.paddings or uui.zero_thickness
+    local margins = self._style.current.margins or uui.zero
+    local paddings = include_paddings and self._style.current.paddings or uui.zero
     local bw = include_border and self._style.current.border_width or 0
 
     local x1 = bw + margins.left + paddings.left
